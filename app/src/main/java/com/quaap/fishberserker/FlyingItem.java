@@ -65,7 +65,7 @@ public class FlyingItem {
         bmWidth = bitmap.getWidth();
         bmHeight = bitmap.getHeight();
         mPaint = new Paint();
-        mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
+        //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
         mScale = (float)Utils.getRand(.7,1);
     }
 
@@ -103,15 +103,23 @@ public class FlyingItem {
 
     public boolean isHit(float x, float y) {
         if (mHit) return false;
-        return (x > mX && x < mX+bmWidth && y > mY && y < mY+bmHeight);
+
+        return (x > mX && x < mX+mBitmap.getWidth() && y > mY && y < mY+mBitmap.getHeight());
 
     }
 
     public FlyingItem[] cut(float x0, float y0) {
+        int max = Math.max(mBitmap.getHeight(),mBitmap.getWidth());
+        Bitmap spun = Bitmap.createBitmap(max,max, Bitmap.Config.ARGB_8888);
+        Canvas rot = new Canvas(spun);
+        mSpinMatrix.reset();
+        mSpinMatrix.setRotate((float)mSpin, max/2, max/2);
+        rot.drawBitmap(mBitmap, mSpinMatrix, null);
+
 
         Bitmap [] bmparts = new Bitmap[2];
-        bmparts[0] = Bitmap.createBitmap(mBitmap, 0, 0, bmWidth/2, bmHeight);
-        bmparts[1] = Bitmap.createBitmap(mBitmap, bmWidth/2, 0, bmWidth/2, bmHeight);
+        bmparts[0] = Bitmap.createBitmap(spun, 0, 0, max/2, max);
+        bmparts[1] = Bitmap.createBitmap(spun, max/2, 0, max/2, max);
 
         FlyingItem[] parts = new FlyingItem[2];
         for (int i=0; i<parts.length; i++) {
@@ -120,20 +128,20 @@ public class FlyingItem {
             parts[i].setBitmap(bmparts[i]);
             parts[i].mHit = true;
             if (i==0) {
-                parts[i].setYv(3);
+                parts[i].setYv(Math.max(Utils.getRand(1,4),mYv));
             } else {
                 parts[i].setYv(mYv * .75);
             }
             parts[i].setXv(mXv * (i*2+1));
-            double d = Utils.getRand(-3,3);
-            parts[i].setSpinv((mSpinv + i*2) *  (d==0?1:d));
+            double d = Utils.getRand(-2,2);
+            parts[i].setSpinv(mSpinv * (d==0?1:d));
         }
 
         return parts;
     }
 
     public void draw(Canvas c) {
-        int max = Math.max(bmHeight,bmWidth);
+        int max = Math.max(mBitmap.getHeight(),mBitmap.getWidth());
 
         mSpinMatrix.reset();
         //mSpinMatrix.setTranslate(0, bmHeight/2);

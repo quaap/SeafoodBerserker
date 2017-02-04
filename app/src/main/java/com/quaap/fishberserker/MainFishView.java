@@ -4,10 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -43,6 +40,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public static final int CONFIG_HEIGHT = 1000;
     public static final int MIN_SWIPE = 30;
     public static final int SWIPE_OVERSHOOT = 15;
+    public static final int MAX_AXES_REPS = 10;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
@@ -118,14 +116,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         canvas.drawPaint(mBGPaint);
 
-        while (mAxes.size()>0) {
+        int times = 0;
+        int points = 0;
+        while (mAxes.size()>0 && times++< MAX_AXES_REPS) {
             float[] axe = mAxes.pop();
 
             if (axe != null) {
                 for (int i = 0; i < axe.length - 4; i += 2) {
                     if (axe[i + 3]>0) {
                         canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
-                        int points = 0;
                         synchronized (itemsInPlay) {
                             List<FlyingItem[]> newItems = new ArrayList<>();
                             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
@@ -141,13 +140,17 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                 Collections.addAll(itemsInPlay, fa);
                             }
                         }
-                        if (points>0 && onPointsListener!=null) {
-                            onPointsListener.onPoints(points);
-                        }
                     }
                 }
             }
         }
+
+        if (mAxes.size()>3) mAxes.clear();
+
+        if (points>0 && onPointsListener!=null) {
+            onPointsListener.onPoints(points);
+        }
+
         synchronized (itemsInPlay) {
             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                 FlyingItem item = it.next();
@@ -316,13 +319,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         }
                         lasttime = System.currentTimeMillis();
                     }
-//                    else {
-//                        try {
-//                            sleep(STEP/5);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
+                    else {
+                        try {
+                            sleep(STEP/5);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }

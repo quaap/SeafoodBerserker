@@ -1,5 +1,8 @@
 package com.quaap.fishberserker;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+
 /**
  * Created by tom on 2/3/17.
  * <p>
@@ -26,5 +29,60 @@ public class Utils {
 
     public static int getRandInt(int min, int max) {
         return (int)((max-min)*Math.random() + min);
+    }
+
+
+    public static Bitmap trimImage(Bitmap image) {
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int left = 0;
+        int top = 0;
+        int right = width - 1;
+        int bottom = height - 1;
+        int minRight = width - 1;
+        int minBottom = height - 1;
+
+        TOP:
+        for (;top < bottom; top++){
+            for (int x = 0; x < width; x++){
+                if (Color.alpha(image.getPixel(x, top)) != 0){
+                    minRight = x;
+                    minBottom = top;
+                    break TOP;
+                }
+            }
+        }
+
+        LEFT:
+        for (;left < minRight; left++){
+            for (int y = height - 1; y > top; y--){
+                if (Color.alpha(image.getPixel(left, y)) != 0){
+                    minBottom = y;
+                    break LEFT;
+                }
+            }
+        }
+
+        BOTTOM:
+        for (;bottom > minBottom; bottom--){
+            for (int x = width - 1; x >= left; x--){
+                if (Color.alpha(image.getPixel(x, bottom)) != 0){
+                    minRight = x;
+                    break BOTTOM;
+                }
+            }
+        }
+
+        right:
+        for (;right > minRight; right--){
+            for (int y = bottom; y >= top; y--){
+                if (Color.alpha(image.getPixel(right, y)) != 0){
+                    break right;
+                }
+            }
+        }
+
+        return Bitmap.createBitmap(image, left, top, right - left + 1, bottom - top + 1);
     }
 }

@@ -6,11 +6,13 @@
         <item>@drawable/fish2</item>
         <item>@drawable/fish3</item>
         <item>@drawable/fish4</item>
+        <item>@drawable/lobster2</item>
     </array>
 
     <integer-array name="points">
         <item>30</item>
         <item>30</item>
+        <item>20</item>
         <item>20</item>
         <item>20</item>
     </integer-array>
