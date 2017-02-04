@@ -1,6 +1,7 @@
 package com.quaap.fishberserker;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -38,15 +39,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final long STEP = 33; // ~30 fps
 
-    private final double GRAVITY = 1;
+    private final double GRAVITY = 2;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -35;
+    private final double INITIAL_YVMIN = GRAVITY * -20;
 
-    private final double INITIAL_YVMAX = GRAVITY * -60;
+    private final double INITIAL_YVMAX = GRAVITY * -35;
 
     private Paint mLinePaint;
     private Paint mBGPaint;
@@ -77,11 +78,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private void init(Context context) {
         final SurfaceHolder holder = getHolder();
         holder.addCallback(this);
-        for (int resid: new int[]{R.drawable.money_1c, R.drawable.money_1d}) {
-            FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), resid));
+        TypedArray fish = getResources().obtainTypedArray(R.array.fish);
+        for (int i=0; i<fish.length(); i++) {
+            FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), fish.getResourceId(i, 0)));
             availableItems.add(item);
-
         }
+        fish.recycle();
+
         this.setOnTouchListener(this);
         mLinePaint = new Paint();
         mLinePaint.setARGB(255, 255, 64, 64);
@@ -100,7 +103,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private void doDraw(final Canvas canvas, long ticks) {
 
-        if (itemsInPlay.size()<3 && Math.random()>.9) {
+        if (itemsInPlay.size()<5 && Math.random()>.95) {
             FlyingItem item = FlyingItem.getCopy(availableItems.get(getRand(availableItems.size())));
 
             double xv = getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
@@ -134,7 +137,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             float[] axe = mAxes.pop();
             if (axe != null) {
                 for (int i = 0; i < axe.length - 4; i += 2) {
-                    canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
+                    if (axe[i + 3]>0) {
+                        canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
+                    }
                 }
             }
         }
@@ -145,6 +150,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private float x1;
     private float y1;
+    private long starttime;
 
     @Override
     public boolean onTouch(View view, MotionEvent e) {
@@ -153,31 +159,35 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         //Log.d("f", e.getAction() + " " + x + " ," + y);
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
-                // System.out.println(e.getAction());
 
-                float dx = x0 - x1;
-                float dy = y0 - y1;
-                double dist = Math.sqrt(dx*dx + dy+dy);
-                //Log.d("f", e.getAction() + " " + speed);
-                if (dist > 100) {
-                    float[] axe = new float[5*2];
+                if (System.currentTimeMillis() - starttime < 200) {
+                    double dx = x0 - x1;
+                    double dy = y0 - y1;
+                    double dist = Math.sqrt(dx * dx + dy + dy);
+                    //Log.d("f", e.getAction() + " " + speed);
+                    if (dist > 80) {
+                        int num = 15;
+                        float[] axe = new float[num * 2];
 
-                    for (int ti=0; ti<10; ti+=2) {
-                        float t = ti/10f;
-                        int xt = (int)((1-t)*x0 + t*x1);
-                        int yt = (int)((1-t)*y0 + t*y1);
-                        axe[ti] = xt;
-                        axe[ti+1] = yt;
-                        synchronized (itemsInPlay) {
-                            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
-                                FlyingItem item = it.next();
-                                if (item.isHit(xt, yt)) {
-                                    it.remove();
+                        int pos = 0;
+                        for (int ti = -num / 2; ti < 10 + num / 2; ti += 2) {
+                            float t = ti / 10f;
+                            int xt = (int) ((1 - t) * x0 + t * x1);
+                            int yt = (int) ((1 - t) * y0 + t * y1);
+                            axe[pos] = xt;
+                            axe[pos + 1] = yt;
+                            pos += 2;
+                            synchronized (itemsInPlay) {
+                                for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+                                    FlyingItem item = it.next();
+                                    if (item.isHit(xt, yt)) {
+                                        it.remove();
+                                    }
                                 }
                             }
                         }
+                        mAxes.push(axe);
                     }
-                    mAxes.push(axe);
                 }
                 break;
 
@@ -188,6 +198,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
             case MotionEvent.ACTION_DOWN:
+                starttime = System.currentTimeMillis();
 
         }
 

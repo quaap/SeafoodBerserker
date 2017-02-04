@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="fish">
+        <item>@drawable/fish1</item>
+        <item>@drawable/fish2</item>
+        <item>@drawable/fish3</item>
+        <item>@drawable/fish4</item>
+    </array>
+
+</resources>
