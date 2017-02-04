@@ -19,79 +19,90 @@ import android.graphics.Canvas;
  * GNU General Public License for more details.
  */
 public class FlyingItem {
-    private Bitmap bitmap;
-    private double x;
-    private double y;
-    private double xv;
-    private double yv;
+    private Bitmap mBitmap;
+    private double mX;
+    private double mY;
+    private double mXv;
+    private double mYv;
+
+    private int bmWidth;
+    private int bmHeight;
 
     public FlyingItem(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        this(bitmap, 0, 0, 0, 0);
     }
 
     public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv) {
-        this.bitmap = bitmap;
-        this.x = x;
-        this.xv = xv;
-        this.y = y;
-        this.yv = yv;
+        this.mBitmap = bitmap;
+        this.mX = x;
+        this.mXv = xv;
+        this.mY = y;
+        this.mYv = yv;
+
+        bmWidth = bitmap.getWidth();
+        bmHeight = bitmap.getHeight();
     }
 
     public static FlyingItem getCopy(FlyingItem item) {
-        return new FlyingItem(item.bitmap, item.x, item.xv, item.y, item.yv);
+        return new FlyingItem(item.mBitmap, item.mX, item.mXv, item.mY, item.mYv);
     }
 
     public void updatePosition(double gravity, double airresit) {
-        yv -= yv*airresit;
-        xv -= xv*airresit;
+        mYv -= Math.signum(mYv)*airresit;
+        mXv -= Math.signum(mXv)*airresit;
 
-        yv += gravity;
+        mYv += gravity;
 
-        x += xv;
-        y += yv;
+        mX += mXv;
+        mY += mYv;
+    }
+
+    public boolean isHit(float x, float y) {
+        return (x > mX && x < mX+bmWidth && y > mY && y < mY+bmHeight);
+
     }
 
     public void draw(Canvas c) {
-        c.drawBitmap(bitmap, (int)x, (int)y, null);
+        c.drawBitmap(mBitmap, (int) mX - bmWidth/2, (int) mY, null);
     }
 
     public Bitmap getBitmap() {
-        return bitmap;
+        return mBitmap;
     }
 
     public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        this.mBitmap = bitmap;
     }
 
     public double getX() {
-        return x;
+        return mX;
     }
 
     public void setX(double x) {
-        this.x = x;
+        this.mX = x;
     }
 
-    public double getXv() {
-        return xv;
+    public double getmXv() {
+        return mXv;
     }
 
-    public void setXv(double xv) {
-        this.xv = xv;
+    public void setmXv(double mXv) {
+        this.mXv = mXv;
     }
 
     public double getY() {
-        return y;
+        return mY;
     }
 
     public void setY(double y) {
-        this.y = y;
+        this.mY = y;
     }
 
-    public double getYv() {
-        return yv;
+    public double getmYv() {
+        return mYv;
     }
 
-    public void setYv(double yv) {
-        this.yv = yv;
+    public void setmYv(double mYv) {
+        this.mYv = mYv;
     }
 }
