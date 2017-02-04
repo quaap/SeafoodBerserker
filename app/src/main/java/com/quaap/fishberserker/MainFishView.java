@@ -40,7 +40,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final long STEP = 33; // ~30 fps
 
-    private final double GRAVITY = 1.25;
+    private final double GRAVITY = 1.3;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
@@ -192,9 +192,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 //if (System.currentTimeMillis() - starttime < 100) {
                     double dx = x0 - x1;
                     double dy = y0 - y1;
-                    double dist = Math.sqrt(dx * dx + dy + dy);
+                    double dist = Math.sqrt(dx * dx + dy * dy);
                     //Log.d("f", e.getAction() + " " + speed);
-                    if (dist > 80) {
+                    if (dist > 40) {
                         int num = 15;
                         float[] axe = new float[num * 2];
 
