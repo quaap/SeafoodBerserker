@@ -1,14 +1,13 @@
 package com.quaap.fishberserker;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
 
 /**
  * Created by tom on 2/3/17.
@@ -43,7 +42,7 @@ public class FlyingItem {
     private int bmWidth;
     private int bmHeight;
 
-    private boolean hit;
+    private boolean mHit;
 
     private static Paint REDPAINT = new Paint();
     static {
@@ -71,7 +70,21 @@ public class FlyingItem {
     }
 
     public static FlyingItem getCopy(FlyingItem item) {
-        return new FlyingItem(item.mBitmap, item.mX, item.mXv, item.mY, item.mYv, item.mSpinv);
+        FlyingItem item2 = new FlyingItem(item.mBitmap);
+
+        item2.mX = item.mX;
+        item2.mXv = item.mXv;
+        item2.mY = item.mY;
+        item2.mYv = item.mYv;
+        item2.mSpinv = item.mSpinv;
+
+        item2.bmWidth = item.bmWidth;
+        item2.bmHeight = item.bmHeight;
+        item2.mPaint = item.mPaint;
+        item2.mScale = item.mScale;
+        item2.mHit = item.mHit;
+
+        return item2;
     }
 
     public void updatePosition(double gravity, double airresit) {
@@ -89,9 +102,30 @@ public class FlyingItem {
     }
 
     public boolean isHit(float x, float y) {
-        if (hit) return false;
+        if (mHit) return false;
         return (x > mX && x < mX+bmWidth && y > mY && y < mY+bmHeight);
 
+    }
+
+    public FlyingItem[] cut(float x0, float y0) {
+
+        Bitmap [] bmparts = new Bitmap[2];
+        bmparts[0] = Bitmap.createBitmap(mBitmap, 0, 0, bmWidth/2, bmHeight);
+        bmparts[1] = Bitmap.createBitmap(mBitmap, bmWidth/2, 0, bmWidth/2, bmHeight);
+
+        FlyingItem[] parts = new FlyingItem[2];
+        for (int i=0; i<parts.length; i++) {
+
+            parts[i] = getCopy(this);
+            parts[i].setBitmap(bmparts[i]);
+            parts[i].mHit = true;
+            parts[i].setYv(mYv - (i+1));
+            parts[i].setXv(mXv * (i*2+1));
+            double d = Utils.getRand(-3,3);
+            parts[i].setSpinv((mSpinv + i*2) *  (d==0?1:d));
+        }
+
+        return parts;
     }
 
     public void draw(Canvas c) {
@@ -108,14 +142,18 @@ public class FlyingItem {
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
 
         Paint p = mPaint;
-        if (hit) {
-            p = REDPAINT;
+        if (mHit) {
+           // p = REDPAINT;
         }
         c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, p);
     }
 
+
+
+
+
     public void setHit() {
-        hit = true;
+        mHit = true;
     }
 
     public Bitmap getBitmap() {
@@ -134,11 +172,11 @@ public class FlyingItem {
         this.mX = x;
     }
 
-    public double getmXv() {
+    public double getXv() {
         return mXv;
     }
 
-    public void setmXv(double mXv) {
+    public void setXv(double mXv) {
         this.mXv = mXv;
     }
 
@@ -150,11 +188,11 @@ public class FlyingItem {
         this.mY = y;
     }
 
-    public double getmYv() {
+    public double getYv() {
         return mYv;
     }
 
-    public void setmYv(double mYv) {
+    public void setYv(double mYv) {
         this.mYv = mYv;
     }
 

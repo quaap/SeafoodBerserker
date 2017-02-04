@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -109,7 +110,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                 FlyingItem item = it.next();
                 item.updatePosition(GRAVITY*1000/mHeight, AIRRESIST);
-                if (item.getY() > mHeight && item.getmYv() > 0) {
+                if (item.getY() > mHeight && item.getYv() > 0) {
                     it.remove();
                 } else {
                     item.draw(canvas);
@@ -123,11 +124,17 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     if (axe[i + 3]>0) {
                         canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
                         synchronized (itemsInPlay) {
+                            List<FlyingItem[]> newItems = new ArrayList<>();
                             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                                 FlyingItem item = it.next();
                                 if (item.isHit(axe[i], axe[i + 1])) {
                                     item.setHit();
+                                    newItems.add(item.cut(axe[i], axe[i + 1]));
+                                    it.remove();
                                 }
+                            }
+                            for (FlyingItem[] fa: newItems) {
+                                Collections.addAll(itemsInPlay, fa);
                             }
                         }
                     }
@@ -141,14 +148,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
         double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
-        item.setmXv(xv);
+        item.setXv(xv);
         if (xv<0) {
             item.setX(Utils.getRand(mWidth/2) + mWidth/2);
         } else {
             item.setX(Utils.getRand(mWidth/2));
         }
         item.setY(mHeight + 20);
-        item.setmYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
+        item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
         item.setSpinv((Math.random()-.5)*45);
 
         synchronized (itemsInPlay) {
