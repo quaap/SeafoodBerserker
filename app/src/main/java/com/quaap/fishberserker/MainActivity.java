@@ -3,13 +3,17 @@ package com.quaap.fishberserker;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.widget.TextView;
 
 
 public class MainActivity extends Activity  {
 
-    MainFishView mMainFishView;
+    private MainFishView mMainFishView;
 
+    private TextView mPointsView;
 
+    private volatile int mPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +25,21 @@ public class MainActivity extends Activity  {
         if (b!=null) b.hide();
 
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
+        mPointsView = (TextView) findViewById(R.id.scores);
 
+        final Handler handler = new Handler();
+        mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
+            @Override
+            public void onPoints(final int points) {
+                mPoints += points;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPointsView.setText(mPoints + " " + points);
+                    }
+                });
+            }
+        });
     }
 
     @Override

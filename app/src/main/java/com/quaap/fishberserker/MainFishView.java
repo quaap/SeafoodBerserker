@@ -61,6 +61,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
 
+    private OnPointsListener onPointsListener;
+
+
     public MainFishView(Context context) {
         super(context);
         init(context);
@@ -96,6 +99,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
+    public void setOnPointsListener(OnPointsListener onPointsListener) {
+        this.onPointsListener = onPointsListener;
+    }
 
 
     private void doDraw(final Canvas canvas, long ticks) {
@@ -106,23 +112,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         canvas.drawPaint(mBGPaint);
 
-        synchronized (itemsInPlay) {
-            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
-                FlyingItem item = it.next();
-                item.updatePosition(GRAVITY*1000/mHeight, AIRRESIST);
-                if (item.getY() > mHeight && item.getYv() > 0) {
-                    it.remove();
-                } else {
-                    item.draw(canvas);
-                }
-            }
-        }
-        if (mAxes.size()>0) {
+        while (mAxes.size()>0) {
             float[] axe = mAxes.pop();
+
             if (axe != null) {
                 for (int i = 0; i < axe.length - 4; i += 2) {
                     if (axe[i + 3]>0) {
                         canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
+                        int points = 0;
                         synchronized (itemsInPlay) {
                             List<FlyingItem[]> newItems = new ArrayList<>();
                             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
@@ -131,13 +128,28 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
                                     it.remove();
+                                    points += 5;
                                 }
                             }
                             for (FlyingItem[] fa: newItems) {
                                 Collections.addAll(itemsInPlay, fa);
                             }
                         }
+                        if (points>0 && onPointsListener!=null) {
+                            onPointsListener.onPoints(points);
+                        }
                     }
+                }
+            }
+        }
+        synchronized (itemsInPlay) {
+            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+                FlyingItem item = it.next();
+                item.updatePosition(GRAVITY*1000/mHeight, AIRRESIST);
+                if (item.getY() > mHeight && item.getYv() > 0) {
+                    it.remove();
+                } else {
+                    item.draw(canvas);
                 }
             }
         }
@@ -177,7 +189,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
 
-                if (System.currentTimeMillis() - starttime < 100) {
+                //if (System.currentTimeMillis() - starttime < 100) {
                     double dx = x0 - x1;
                     double dy = y0 - y1;
                     double dist = Math.sqrt(dx * dx + dy + dy);
@@ -197,7 +209,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         }
                         mAxes.push(axe);
                     }
-                }
+                //}
                 break;
 
 
@@ -207,7 +219,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
             case MotionEvent.ACTION_DOWN:
-                starttime = System.currentTimeMillis();
+                //starttime = System.currentTimeMillis();
 
         }
 
@@ -328,6 +340,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
+    public interface OnPointsListener {
+        void onPoints(int points);
+    }
 
 
 }
