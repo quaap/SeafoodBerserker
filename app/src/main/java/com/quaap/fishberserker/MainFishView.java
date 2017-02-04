@@ -126,7 +126,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                                 FlyingItem item = it.next();
                                 if (item.isHit(axe[i], axe[i + 1])) {
-                                    it.remove();
+                                    item.setHit();
                                 }
                             }
                         }

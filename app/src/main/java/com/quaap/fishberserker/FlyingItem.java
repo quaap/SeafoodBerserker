@@ -34,6 +34,7 @@ public class FlyingItem {
 
     private Paint mPaint;
 
+
     private float mScale;
     private double mSpin;
     private double mSpinv;
@@ -41,6 +42,14 @@ public class FlyingItem {
 
     private int bmWidth;
     private int bmHeight;
+
+    private boolean hit;
+
+    private static Paint REDPAINT = new Paint();
+    static {
+        REDPAINT.setColorFilter(new PorterDuffColorFilter(Color.argb(255, 180, 30,30), PorterDuff.Mode.SRC_IN));
+    }
+
 
     public FlyingItem(Bitmap bitmap) {
         this(bitmap, 0, 0, 0, 0, 0);
@@ -80,6 +89,7 @@ public class FlyingItem {
     }
 
     public boolean isHit(float x, float y) {
+        if (hit) return false;
         return (x > mX && x < mX+bmWidth && y > mY && y < mY+bmHeight);
 
     }
@@ -97,8 +107,15 @@ public class FlyingItem {
         Canvas rot = new Canvas(bm);
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
 
+        Paint p = mPaint;
+        if (hit) {
+            p = REDPAINT;
+        }
+        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, p);
+    }
 
-        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, mPaint);
+    public void setHit() {
+        hit = true;
     }
 
     public Bitmap getBitmap() {
