@@ -76,21 +76,23 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     private void init(Context context) {
-        final SurfaceHolder holder = getHolder();
-        holder.addCallback(this);
-        TypedArray fish = getResources().obtainTypedArray(R.array.fish);
-        for (int i=0; i<fish.length(); i++) {
-            FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), fish.getResourceId(i, 0)));
-            availableItems.add(item);
-        }
-        fish.recycle();
+        if (!this.isInEditMode()) {
+            final SurfaceHolder holder = getHolder();
+            holder.addCallback(this);
+            TypedArray fish = getResources().obtainTypedArray(R.array.fish);
+            for (int i = 0; i < fish.length(); i++) {
+                FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), fish.getResourceId(i, 0)));
+                availableItems.add(item);
+            }
+            fish.recycle();
 
-        this.setOnTouchListener(this);
-        mLinePaint = new Paint();
-        mLinePaint.setARGB(255, 255, 64, 64);
-        mLinePaint.setStrokeWidth(5);
-        mBGPaint =  new Paint();
-        mBGPaint.setARGB(255, 255, 255, 255);
+            this.setOnTouchListener(this);
+            mLinePaint = new Paint();
+            mLinePaint.setARGB(255, 255, 64, 64);
+            mLinePaint.setStrokeWidth(5);
+            mBGPaint = new Paint();
+            mBGPaint.setARGB(255, 255, 255, 255);
+        }
     }
 
 
@@ -98,22 +100,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private void doDraw(final Canvas canvas, long ticks) {
 
         if (itemsInPlay.size()<5 && Math.random()>.95) {
-            FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
-
-            double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
-            item.setmXv(xv);
-            if (xv<0) {
-                item.setX(Utils.getRand(mWidth/2) + mWidth/2);
-            } else {
-                item.setX(Utils.getRand(mWidth/2));
-            }
-            item.setY(mHeight + 20);
-            item.setmYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
-            item.setSpinv((Math.random()-.5)*45);
-
-            synchronized (itemsInPlay) {
-                itemsInPlay.add(item);
-            }
+            spawnFish();
         }
 
         canvas.drawPaint(mBGPaint);
@@ -135,11 +122,38 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 for (int i = 0; i < axe.length - 4; i += 2) {
                     if (axe[i + 3]>0) {
                         canvas.drawLine(axe[i], axe[i + 1], axe[i + 2], axe[i + 3], mLinePaint);
+                        synchronized (itemsInPlay) {
+                            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+                                FlyingItem item = it.next();
+                                if (item.isHit(axe[i], axe[i + 1])) {
+                                    it.remove();
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
+    }
+
+    private void spawnFish() {
+        FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
+
+        double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
+        item.setmXv(xv);
+        if (xv<0) {
+            item.setX(Utils.getRand(mWidth/2) + mWidth/2);
+        } else {
+            item.setX(Utils.getRand(mWidth/2));
+        }
+        item.setY(mHeight + 20);
+        item.setmYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
+        item.setSpinv((Math.random()-.5)*45);
+
+        synchronized (itemsInPlay) {
+            itemsInPlay.add(item);
+        }
     }
 
     private volatile Stack<float[]> mAxes = new Stack<>();
@@ -173,14 +187,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                             axe[pos] = xt;
                             axe[pos + 1] = yt;
                             pos += 2;
-                            synchronized (itemsInPlay) {
-                                for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
-                                    FlyingItem item = it.next();
-                                    if (item.isHit(xt, yt)) {
-                                        it.remove();
-                                    }
-                                }
-                            }
                         }
                         mAxes.push(axe);
                     }

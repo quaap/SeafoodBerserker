@@ -34,6 +34,7 @@ public class FlyingItem {
 
     private Paint mPaint;
 
+    private float mScale;
     private double mSpin;
     private double mSpinv;
     Matrix mSpinMatrix = new Matrix();
@@ -57,6 +58,7 @@ public class FlyingItem {
         bmHeight = bitmap.getHeight();
         mPaint = new Paint();
         mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
+        mScale = (float)Utils.getRand(.7,1);
     }
 
     public static FlyingItem getCopy(FlyingItem item) {
@@ -89,10 +91,12 @@ public class FlyingItem {
         //mSpinMatrix.setTranslate(0, bmHeight/2);
         mSpinMatrix.setRotate((float)mSpin, max/2, max/2);
         // mSpinMatrix.setTranslate(max/2, max/2);
+        mSpinMatrix.postScale(mScale,mScale);
 
         Bitmap bm = Bitmap.createBitmap(max, max, Bitmap.Config.ARGB_8888);
         Canvas rot = new Canvas(bm);
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
+
 
         c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, mPaint);
     }
