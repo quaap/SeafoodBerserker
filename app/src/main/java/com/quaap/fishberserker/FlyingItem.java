@@ -119,7 +119,11 @@ public class FlyingItem {
             parts[i] = getCopy(this);
             parts[i].setBitmap(bmparts[i]);
             parts[i].mHit = true;
-            parts[i].setYv(mYv * .75 - (i+1));
+            if (i==0) {
+                parts[i].setYv(3);
+            } else {
+                parts[i].setYv(mYv * .75);
+            }
             parts[i].setXv(mXv * (i*2+1));
             double d = Utils.getRand(-3,3);
             parts[i].setSpinv((mSpinv + i*2) *  (d==0?1:d));

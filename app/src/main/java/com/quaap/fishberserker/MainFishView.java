@@ -38,17 +38,23 @@ import java.util.Stack;
  */
 public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback, SurfaceView.OnTouchListener  {
 
-    private final long STEP = 33; // ~30 fps
+    public static final int MAX_FLY = 10;
+    public static final double SPAWN_CHANCE = .95;
+    public static final int CONFIG_HEIGHT = 1000;
+    public static final int MIN_SWIPE = 30;
+    public static final int SWIPE_OVERSHOOT = 15;
 
-    private final double GRAVITY = 1.3;
+    private final long STEP = 33; // 1000 ms / ~30 fps  =  33
+
+    private final double GRAVITY = 1.75;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -27;
+    private final double INITIAL_YVMIN = GRAVITY * -24;
 
-    private final double INITIAL_YVMAX = GRAVITY * -40;
+    private final double INITIAL_YVMAX = GRAVITY * -34;
 
     private Paint mLinePaint;
     private Paint mBGPaint;
@@ -106,7 +112,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private void doDraw(final Canvas canvas, long ticks) {
 
-        if (itemsInPlay.size()<5 && Math.random()>.95) {
+        if (itemsInPlay.size()< MAX_FLY && Math.random()>SPAWN_CHANCE) {
             spawnFish();
         }
 
@@ -145,7 +151,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         synchronized (itemsInPlay) {
             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                 FlyingItem item = it.next();
-                item.updatePosition(GRAVITY*1000/mHeight, AIRRESIST);
+                item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
                 if (item.getY() > mHeight && item.getYv() > 0) {
                     it.remove();
                 } else {
@@ -194,8 +200,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     double dy = y0 - y1;
                     double dist = Math.sqrt(dx * dx + dy * dy);
                     //Log.d("f", e.getAction() + " " + speed);
-                    if (dist > 40) {
-                        int num = 15;
+                    if (dist > MIN_SWIPE) {
+                        int num = SWIPE_OVERSHOOT;
                         float[] axe = new float[num * 2];
 
                         int pos = 0;
