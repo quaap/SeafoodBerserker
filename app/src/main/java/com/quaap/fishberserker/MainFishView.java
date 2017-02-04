@@ -39,15 +39,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final long STEP = 33; // ~30 fps
 
-    private final double GRAVITY = 2;
+    private final double GRAVITY = 1.25;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -20;
+    private final double INITIAL_YVMIN = GRAVITY * -27;
 
-    private final double INITIAL_YVMAX = GRAVITY * -35;
+    private final double INITIAL_YVMAX = GRAVITY * -40;
 
     private Paint mLinePaint;
     private Paint mBGPaint;
@@ -115,7 +115,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             }
             item.setY(mHeight + 20);
             item.setmYv(getRand(INITIAL_YVMIN, INITIAL_YVMAX));
-            item.setSpinv((Math.random()-.5)*30);
+            item.setSpinv((Math.random()-.5)*45);
 
             synchronized (itemsInPlay) {
                 itemsInPlay.add(item);
@@ -162,7 +162,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
 
-                if (System.currentTimeMillis() - starttime < 200) {
+                if (System.currentTimeMillis() - starttime < 100) {
                     double dx = x0 - x1;
                     double dy = y0 - y1;
                     double dist = Math.sqrt(dx * dx + dy + dy);
