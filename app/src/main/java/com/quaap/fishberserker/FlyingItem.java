@@ -1,7 +1,9 @@
 package com.quaap.fishberserker;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 
 /**
  * Created by tom on 2/3/17.
@@ -25,36 +27,46 @@ public class FlyingItem {
     private double mXv;
     private double mYv;
 
+
+    private double mSpin;
+    private double mSpinv;
+    Matrix mSpinMatrix = new Matrix();
+
     private int bmWidth;
     private int bmHeight;
 
     public FlyingItem(Bitmap bitmap) {
-        this(bitmap, 0, 0, 0, 0);
+        this(bitmap, 0, 0, 0, 0, 0);
     }
 
-    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv) {
-        this.mBitmap = bitmap;
-        this.mX = x;
-        this.mXv = xv;
-        this.mY = y;
-        this.mYv = yv;
+    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
+        mBitmap = bitmap;
+        mX = x;
+        mXv = xv;
+        mY = y;
+        mYv = yv;
+        mSpinv = spinv;
 
         bmWidth = bitmap.getWidth();
         bmHeight = bitmap.getHeight();
     }
 
     public static FlyingItem getCopy(FlyingItem item) {
-        return new FlyingItem(item.mBitmap, item.mX, item.mXv, item.mY, item.mYv);
+        return new FlyingItem(item.mBitmap, item.mX, item.mXv, item.mY, item.mYv, item.mSpinv);
     }
 
     public void updatePosition(double gravity, double airresit) {
         mYv -= Math.signum(mYv)*airresit;
         mXv -= Math.signum(mXv)*airresit;
 
+        mSpinv -= Math.signum(mSpinv)*airresit*2;
+
+
         mYv += gravity;
 
         mX += mXv;
         mY += mYv;
+        mSpin += mSpinv;
     }
 
     public boolean isHit(float x, float y) {
@@ -63,7 +75,18 @@ public class FlyingItem {
     }
 
     public void draw(Canvas c) {
-        c.drawBitmap(mBitmap, (int) mX - bmWidth/2, (int) mY, null);
+        int max = Math.max(bmHeight,bmWidth);
+
+        mSpinMatrix.reset();
+        //mSpinMatrix.setTranslate(0, bmHeight/2);
+        mSpinMatrix.setRotate((float)mSpin, max/2, max/2);
+        // mSpinMatrix.setTranslate(max/2, max/2);
+
+        Bitmap bm = Bitmap.createBitmap(max, max, Bitmap.Config.ARGB_8888);
+        Canvas rot = new Canvas(bm);
+        rot.drawBitmap(mBitmap, mSpinMatrix, null);
+
+        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, null);
     }
 
     public Bitmap getBitmap() {
@@ -104,5 +127,9 @@ public class FlyingItem {
 
     public void setmYv(double mYv) {
         this.mYv = mYv;
+    }
+
+    public void setSpinv(double spinv) {
+        mSpinv = spinv;
     }
 }

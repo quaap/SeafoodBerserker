@@ -115,6 +115,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             }
             item.setY(mHeight + 20);
             item.setmYv(getRand(INITIAL_YVMIN, INITIAL_YVMAX));
+            item.setSpinv((Math.random()-.5)*30);
+
             synchronized (itemsInPlay) {
                 itemsInPlay.add(item);
             }
