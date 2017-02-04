@@ -93,28 +93,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mBGPaint.setARGB(255, 255, 255, 255);
     }
 
-    private static int getRand(int max) {
-        return (int) (max*Math.random());
-    }
 
-    private static double getRand(double min, double max) {
-        return (max-min)*Math.random() + min;
-    }
 
     private void doDraw(final Canvas canvas, long ticks) {
 
         if (itemsInPlay.size()<5 && Math.random()>.95) {
-            FlyingItem item = FlyingItem.getCopy(availableItems.get(getRand(availableItems.size())));
+            FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
-            double xv = getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
+            double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
             item.setmXv(xv);
             if (xv<0) {
-                item.setX(getRand(mWidth/2) + mWidth/2);
+                item.setX(Utils.getRand(mWidth/2) + mWidth/2);
             } else {
-                item.setX(getRand(mWidth/2));
+                item.setX(Utils.getRand(mWidth/2));
             }
             item.setY(mHeight + 20);
-            item.setmYv(getRand(INITIAL_YVMIN, INITIAL_YVMAX));
+            item.setmYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
             item.setSpinv((Math.random()-.5)*45);
 
             synchronized (itemsInPlay) {

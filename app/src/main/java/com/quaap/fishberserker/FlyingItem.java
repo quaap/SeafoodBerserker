@@ -3,7 +3,12 @@ package com.quaap.fishberserker;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 
 /**
  * Created by tom on 2/3/17.
@@ -27,6 +32,7 @@ public class FlyingItem {
     private double mXv;
     private double mYv;
 
+    private Paint mPaint;
 
     private double mSpin;
     private double mSpinv;
@@ -49,6 +55,8 @@ public class FlyingItem {
 
         bmWidth = bitmap.getWidth();
         bmHeight = bitmap.getHeight();
+        mPaint = new Paint();
+        mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
     }
 
     public static FlyingItem getCopy(FlyingItem item) {
@@ -59,7 +67,7 @@ public class FlyingItem {
         mYv -= Math.signum(mYv)*airresit;
         mXv -= Math.signum(mXv)*airresit;
 
-        mSpinv -= Math.signum(mSpinv)*airresit*2;
+        mSpinv -= Math.signum(mSpinv)*airresit*3;
 
 
         mYv += gravity;
@@ -86,7 +94,7 @@ public class FlyingItem {
         Canvas rot = new Canvas(bm);
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
 
-        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, null);
+        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, mPaint);
     }
 
     public Bitmap getBitmap() {
