@@ -84,7 +84,7 @@ public class MainActivity extends Activity  {
                     public void run() {
                         mMainFishView.startWave(mWavenum, 5000, 11);
                     }
-                }, 3000);
+                }, 3500);
             }
         };
 
