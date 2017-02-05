@@ -96,8 +96,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             final SurfaceHolder holder = getHolder();
             holder.addCallback(this);
             TypedArray fish = getResources().obtainTypedArray(R.array.fish);
+            int[] values = getResources().getIntArray(R.array.points);
             for (int i = 0; i < fish.length(); i++) {
                 FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), fish.getResourceId(i, 0)));
+                item.setValue(values[i]);
                 availableItems.add(item);
             }
             fish.recycle();
@@ -148,7 +150,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setXv(item.getXv()/2);
                                     item.setSpinv(1);
                                     canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
-                                    points += 5;
+                                    points += item.getValue();
                                     hits++;
                                 }
                             }
@@ -175,7 +177,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
                 if (item.getY() > mHeight && item.getYv() > 0) {
                     if (!item.wasHit() && onPointsListener!=null) {
-                        onPointsListener.onMiss();
+                        onPointsListener.onMiss(item.getValue());
                     }
                     it.remove();
                 } else {
@@ -372,7 +374,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     public interface OnPointsListener {
         void onPoints(int points, int hits);
-        void onMiss();
+        void onMiss(int points);
     }
 
 

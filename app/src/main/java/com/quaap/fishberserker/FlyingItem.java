@@ -5,9 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.PorterDuffXfermode;
 
 /**
  * Created by tom on 2/3/17.
@@ -34,6 +31,14 @@ public class FlyingItem {
     private Paint mPaint;
 
 
+    private static Paint scorePaint;
+    static {
+        scorePaint = new Paint();
+        scorePaint.setColor(Color.BLACK);
+        scorePaint.setShadowLayer(8,8,8,Color.WHITE);
+        scorePaint.setTextSize(60);
+    }
+
     private float mScale;
     private double mSpin;
     private double mSpinv;
@@ -41,34 +46,29 @@ public class FlyingItem {
 
     private boolean fade;
 
-
     private boolean mHit;
 
-//    private static Paint REDPAINT = new Paint();
-//    static {
-//        REDPAINT.setColorFilter(new PorterDuffColorFilter(Color.argb(255, 180, 30,30), PorterDuff.Mode.SRC_IN));
-//    }
+    private int mValue;
+    private String mText;
 
 
     public FlyingItem(Bitmap bitmap) {
+        this(bitmap, 0, 0, 0, 0, 0);
+    }
+
+    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
         mBitmap = bitmap;
+        mX = x;
+        mXv = xv;
+        mY = y;
+        mYv = yv;
+        mSpinv = spinv;
+
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
         mScale = (float)Utils.getRand(.7,1);
     }
 
-//    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
-
-//        mX = x;
-//        mXv = xv;
-//        mY = y;
-//        mYv = yv;
-//        mSpinv = spinv;
-//
-//        mPaint = new Paint();
-//        //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
-//        mScale = (float)Utils.getRand(.7,1);
-//    }
 
     public static FlyingItem getCopy(FlyingItem item) {
         FlyingItem item2 = new FlyingItem(item.mBitmap);
@@ -83,6 +83,7 @@ public class FlyingItem {
         item2.mPaint = new Paint(item.mPaint);
         item2.mScale = item.mScale;
         item2.mHit = item.mHit;
+        item2.mValue = item.mValue;
 
         return item2;
     }
@@ -143,6 +144,8 @@ public class FlyingItem {
             parts[i].setSpinv((d==0?1:d));
         }
 
+        mText = "" + mValue;
+        mHit = true;
         fade = true;
         return parts;
     }
@@ -160,24 +163,32 @@ public class FlyingItem {
         Canvas rot = new Canvas(bm);
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
 
-        Paint p = mPaint;
+
         if (fade) {
             int step = 10;
-            int a = p.getAlpha();
+            int a = mPaint.getAlpha();
             if (a>step) {
-                p.setAlpha(a-step);
+                mPaint.setAlpha(a-step);
             }
 
         }
         if (mHit) {
            // p = REDPAINT;
         }
-        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, p);
+        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, mPaint);
+        if (mText!=null) {
+            c.drawText(mText, (int) mX - max/2, (int) mY - max/3, scorePaint);
+        }
     }
 
 
+    public int getValue() {
+        return mValue;
+    }
 
-
+    public void setValue(int mValue) {
+        this.mValue = mValue;
+    }
 
     public void setHit() {
         mHit = true;

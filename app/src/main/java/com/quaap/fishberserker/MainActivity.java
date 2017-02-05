@@ -15,6 +15,8 @@ public class MainActivity extends Activity  {
 
     private volatile int mPoints;
 
+    final Handler handler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +29,7 @@ public class MainActivity extends Activity  {
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
         mPointsView = (TextView) findViewById(R.id.scores);
 
-        final Handler handler = new Handler();
+
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
             public void onPoints(final int points, int hits) {
@@ -41,7 +43,7 @@ public class MainActivity extends Activity  {
             }
 
             @Override
-            public void onMiss() {
+            public void onMiss(int points) {
 
             }
         });
