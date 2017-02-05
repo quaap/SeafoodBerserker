@@ -30,7 +30,7 @@ public class MainActivity extends Activity  {
         final Handler handler = new Handler();
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
-            public void onPoints(final int points) {
+            public void onPoints(final int points, int hits) {
                 mPoints += points;
                 handler.post(new Runnable() {
                     @Override
@@ -38,6 +38,11 @@ public class MainActivity extends Activity  {
                         mPointsView.setText(mPoints + " " + points);
                     }
                 });
+            }
+
+            @Override
+            public void onMiss() {
+
             }
         });
     }

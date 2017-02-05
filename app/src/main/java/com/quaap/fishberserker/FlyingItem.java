@@ -44,28 +44,31 @@ public class FlyingItem {
 
     private boolean mHit;
 
-    private static Paint REDPAINT = new Paint();
-    static {
-        REDPAINT.setColorFilter(new PorterDuffColorFilter(Color.argb(255, 180, 30,30), PorterDuff.Mode.SRC_IN));
-    }
+//    private static Paint REDPAINT = new Paint();
+//    static {
+//        REDPAINT.setColorFilter(new PorterDuffColorFilter(Color.argb(255, 180, 30,30), PorterDuff.Mode.SRC_IN));
+//    }
 
 
     public FlyingItem(Bitmap bitmap) {
-        this(bitmap, 0, 0, 0, 0, 0);
-    }
-
-    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
         mBitmap = bitmap;
-        mX = x;
-        mXv = xv;
-        mY = y;
-        mYv = yv;
-        mSpinv = spinv;
-
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
         mScale = (float)Utils.getRand(.7,1);
     }
+
+//    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
+
+//        mX = x;
+//        mXv = xv;
+//        mY = y;
+//        mYv = yv;
+//        mSpinv = spinv;
+//
+//        mPaint = new Paint();
+//        //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
+//        mScale = (float)Utils.getRand(.7,1);
+//    }
 
     public static FlyingItem getCopy(FlyingItem item) {
         FlyingItem item2 = new FlyingItem(item.mBitmap);
@@ -105,7 +108,10 @@ public class FlyingItem {
         int height2 = mBitmap.getHeight()/2;
 
         return (x > mX-width2 && x < mX+width2 && y > mY-height2 && y < mY+height2);
+    }
 
+    public boolean wasHit() {
+        return mHit;
     }
 
     public FlyingItem[] cut(float x0, float y0) {

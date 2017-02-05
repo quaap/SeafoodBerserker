@@ -126,6 +126,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         int times = 0;
         int points = 0;
+        int hits = 0;
         while (mAxes.size()>0 && times++< MAX_AXES_REPS) {
             float[] axe = mAxes.pop();
 
@@ -148,10 +149,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setSpinv(1);
                                     canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
                                     points += 5;
+                                    hits++;
                                 }
                             }
                             for (FlyingItem[] fa: newItems) {
-                                Collections.addAll(itemsInPlay, fa);
+                                for (FlyingItem f: fa) {
+                                    itemsInPlay.add(0,f);
+                                }
                             }
                         }
                     }
@@ -162,7 +166,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         if (mAxes.size()>3) mAxes.clear();
 
         if (points>0 && onPointsListener!=null) {
-            onPointsListener.onPoints(points);
+            onPointsListener.onPoints(points,hits);
         }
 
         synchronized (itemsInPlay) {
@@ -170,6 +174,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 FlyingItem item = it.next();
                 item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
                 if (item.getY() > mHeight && item.getYv() > 0) {
+                    if (!item.wasHit() && onPointsListener!=null) {
+                        onPointsListener.onMiss();
+                    }
                     it.remove();
                 } else {
                     item.draw(canvas);
@@ -364,7 +371,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     public interface OnPointsListener {
-        void onPoints(int points);
+        void onPoints(int points, int hits);
+        void onMiss();
     }
 
 
