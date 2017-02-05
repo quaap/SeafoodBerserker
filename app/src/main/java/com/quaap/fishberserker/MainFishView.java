@@ -39,7 +39,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public static final int MAX_FLY = 10;
     public static final double SPAWN_CHANCE = .95;
     public static final int CONFIG_HEIGHT = 1000;
-    public static final int MIN_SWIPE = 30;
+    public static final int MIN_SWIPE = 40;
     public static final int SWIPE_OVERSHOOT = 20;
     public static final int MAX_AXES_REPS = 10;
 
@@ -334,11 +334,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         lasttime = System.currentTimeMillis();
                     }
                     else {
-                        try {
-                            sleep(STEP/5);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            sleep(STEP/5);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             }

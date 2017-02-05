@@ -39,8 +39,8 @@ public class FlyingItem {
     private double mSpinv;
     Matrix mSpinMatrix = new Matrix();
 
-    private int bmWidth;
-    private int bmHeight;
+    private boolean fade;
+
 
     private boolean mHit;
 
@@ -62,8 +62,6 @@ public class FlyingItem {
         mYv = yv;
         mSpinv = spinv;
 
-        bmWidth = bitmap.getWidth();
-        bmHeight = bitmap.getHeight();
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
         mScale = (float)Utils.getRand(.7,1);
@@ -78,9 +76,8 @@ public class FlyingItem {
         item2.mYv = item.mYv;
         item2.mSpinv = item.mSpinv;
 
-        item2.bmWidth = item.bmWidth;
-        item2.bmHeight = item.bmHeight;
-        item2.mPaint = item.mPaint;
+
+        item2.mPaint = new Paint(item.mPaint);
         item2.mScale = item.mScale;
         item2.mHit = item.mHit;
 
@@ -104,7 +101,10 @@ public class FlyingItem {
     public boolean isHit(float x, float y) {
         if (mHit) return false;
 
-        return (x > mX && x < mX+mBitmap.getWidth() && y > mY && y < mY+mBitmap.getHeight());
+        int width2 = mBitmap.getWidth()/2;
+        int height2 = mBitmap.getHeight()/2;
+
+        return (x > mX-width2 && x < mX+width2 && y > mY-height2 && y < mY+height2);
 
     }
 
@@ -128,15 +128,16 @@ public class FlyingItem {
             parts[i].setBitmap(bmparts[i]);
             parts[i].mHit = true;
             if (i==0) {
-                parts[i].setYv(Math.max(Utils.getRand(1,4),mYv));
+                parts[i].setYv(Math.max(Utils.getRand(1,4), mYv));
             } else {
-                parts[i].setYv(mYv * .75);
+                parts[i].setYv(mYv<0 ? mYv*.75 : mYv*1.5);
             }
             parts[i].setXv(mXv * (i*2+1));
-            double d = Utils.getRand(-2,2);
-            parts[i].setSpinv(mSpinv * (d==0?1:d));
+            double d = Utils.getRand(-7,7);
+            parts[i].setSpinv((d==0?1:d));
         }
 
+        fade = true;
         return parts;
     }
 
@@ -154,6 +155,14 @@ public class FlyingItem {
         rot.drawBitmap(mBitmap, mSpinMatrix, null);
 
         Paint p = mPaint;
+        if (fade) {
+            int step = 10;
+            int a = p.getAlpha();
+            if (a>step) {
+                p.setAlpha(a-step);
+            }
+
+        }
         if (mHit) {
            // p = REDPAINT;
         }
