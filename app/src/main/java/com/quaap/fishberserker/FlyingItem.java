@@ -151,31 +151,33 @@ public class FlyingItem {
     }
 
     public void draw(Canvas c) {
-        int max = Math.max(mBitmap.getHeight(),mBitmap.getWidth());
+        int max = 50;
+        if (mBitmap!=null) {
+            max = Math.max(mBitmap.getHeight(), mBitmap.getWidth());
 
-        mSpinMatrix.reset();
-        //mSpinMatrix.setTranslate(0, bmHeight/2);
-        mSpinMatrix.setRotate((float)mSpin, max/2, max/2);
-        // mSpinMatrix.setTranslate(max/2, max/2);
-        mSpinMatrix.postScale(mScale,mScale);
-
-        Bitmap bm = Bitmap.createBitmap(max, max, Bitmap.Config.ARGB_8888);
-        Canvas rot = new Canvas(bm);
-        rot.drawBitmap(mBitmap, mSpinMatrix, null);
+            mSpinMatrix.reset();
+            //mSpinMatrix.setTranslate(0, bmHeight/2);
+            mSpinMatrix.setRotate((float) mSpin, max / 2, max / 2);
+            // mSpinMatrix.setTranslate(max/2, max/2);
+            mSpinMatrix.postScale(mScale, mScale);
 
 
-        if (fade) {
-            int step = 10;
-            int a = mPaint.getAlpha();
-            if (a>step) {
-                mPaint.setAlpha(a-step);
+            Bitmap bm = Bitmap.createBitmap(max, max, Bitmap.Config.ARGB_8888);
+            Canvas rot = new Canvas(bm);
+            rot.drawBitmap(mBitmap, mSpinMatrix, null);
+
+
+            if (fade) {
+                int step = 10;
+                int a = mPaint.getAlpha();
+                if (a > step) {
+                    mPaint.setAlpha(a - step);
+                }
+
             }
 
+            c.drawBitmap(bm, (int) mX - max / 2, (int) mY - max / 2, mPaint);
         }
-        if (mHit) {
-           // p = REDPAINT;
-        }
-        c.drawBitmap(bm, (int) mX - max/2, (int) mY - max/2, mPaint);
         if (mText!=null) {
             c.drawText(mText, (int) mX - max/2, (int) mY - max/3, scorePaint);
         }

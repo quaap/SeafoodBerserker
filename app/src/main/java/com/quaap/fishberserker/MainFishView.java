@@ -57,6 +57,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private Paint mLinePaint;
     private Paint mBGPaint;
+    private Paint mTextPaint;
 
     private RunThread mThread;
 
@@ -67,6 +68,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
 
     private final Bitmap[] splats = new Bitmap[2];
+
+
+    private String mText;
 
 
     private OnPointsListener onPointsListener;
@@ -110,6 +114,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             mLinePaint.setStrokeWidth(5);
             mBGPaint = new Paint();
             mBGPaint.setARGB(255, 255, 255, 255);
+
+            mTextPaint = new Paint();
+            mTextPaint.setARGB(255, 255, 64, 64);
+            mTextPaint.setStrokeWidth(5);
+            mTextPaint.setTextSize(90);
         }
     }
 
@@ -117,12 +126,71 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         this.onPointsListener = onPointsListener;
     }
 
+    private Bitmap mTextBitmap;
+    public void setText(String text) {
+        mText = text;
+        if (text ==null || text.trim().equals("")) {
+            mTextBitmap = null;
+        } else {
+
+            mTextBitmap = Bitmap.createBitmap(400,200, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(mTextBitmap);
+            c.drawText(text,0,0, mTextPaint);
+        }
+
+    }
+
+    public void setBonusMode(boolean on) {
+
+    }
+
+    private long mWaveStarted;
+    private int mWaveNum;
+    private int mIntervalmillis;
+    private int mIntervals;
+    private long mIntervalStarted;
+    private int mMaxNumFly;
+
+    private boolean mWaveGoing;
+
+    public void startWave(int num, int intervalmillis, int intervals) {
+        mWaveNum = num;
+        mIntervalmillis = intervalmillis;
+        mIntervals = intervals;
+        mWaveStarted = System.currentTimeMillis();
+        mIntervalStarted = mWaveStarted;
+        mMaxNumFly = num + 2;
+        mWaveGoing = true;
+    }
+
+    private void spawnAsNeeded() {
+        if (mWaveGoing) {
+            long now = System.currentTimeMillis();
+            long wavespan = now - mWaveStarted;
+            if (wavespan < mIntervalmillis * mIntervals) {
+                long intervalspan = now - mIntervalStarted;
+
+                if (intervalspan > mIntervalmillis) {
+                    mIntervalStarted = now;
+                    return;
+                }
+
+
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis)) {
+                    spawnFish();
+                }
+            } else {
+                mWaveGoing = false;
+            }
+        }
+    }
 
     private void doDraw(final Canvas canvas, long ticks) {
 
-        if (itemsInPlay.size()< MAX_FLY && Math.random()>SPAWN_CHANCE) {
-            spawnFish();
-        }
+        spawnAsNeeded();
+//        if (itemsInPlay.size()< MAX_FLY && Math.random()>SPAWN_CHANCE) {
+//            spawnFish();
+//        }
 
         canvas.drawPaint(mBGPaint);
 
@@ -167,7 +235,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         if (mAxes.size()>3) mAxes.clear();
 
-        if (points>0 && onPointsListener!=null) {
+        if ((points>0 || hits>0) && onPointsListener!=null) {
             onPointsListener.onPoints(points,hits);
         }
 

@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class MainActivity extends Activity  {
 
@@ -17,6 +20,10 @@ public class MainActivity extends Activity  {
 
     final Handler handler = new Handler();
 
+    final Timer timer = new Timer();
+    TimerTask task;
+
+    int mWavenum = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +54,13 @@ public class MainActivity extends Activity  {
 
             }
         });
+
+
     }
 
     @Override
     protected void onPause() {
+        task.cancel();
         mMainFishView.pause();
         super.onPause();
     }
@@ -59,5 +69,13 @@ public class MainActivity extends Activity  {
     protected void onResume() {
         super.onResume();
         mMainFishView.unpause();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                mMainFishView.startWave(mWavenum++, 5000, 11);
+            }
+        };
+
+        timer.schedule(task, 3000, 60000);
     }
 }
