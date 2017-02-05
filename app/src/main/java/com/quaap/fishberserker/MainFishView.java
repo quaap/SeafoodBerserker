@@ -2,6 +2,7 @@ package com.quaap.fishberserker;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -39,20 +40,20 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public static final double SPAWN_CHANCE = .95;
     public static final int CONFIG_HEIGHT = 1000;
     public static final int MIN_SWIPE = 30;
-    public static final int SWIPE_OVERSHOOT = 15;
+    public static final int SWIPE_OVERSHOOT = 20;
     public static final int MAX_AXES_REPS = 10;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
-    private final double GRAVITY = 1.75;
+    private final double GRAVITY = 2;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -24;
+    private final double INITIAL_YVMIN = GRAVITY * -20;
 
-    private final double INITIAL_YVMAX = GRAVITY * -34;
+    private final double INITIAL_YVMAX = GRAVITY * -30;
 
     private Paint mLinePaint;
     private Paint mBGPaint;
@@ -64,6 +65,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
+
+    private final Bitmap[] splats = new Bitmap[2];
+
 
     private OnPointsListener onPointsListener;
 
@@ -85,6 +89,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private void init(Context context) {
         if (!this.isInEditMode()) {
+
+            splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
+            splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
+
             final SurfaceHolder holder = getHolder();
             holder.addCallback(this);
             TypedArray fish = getResources().obtainTypedArray(R.array.fish);
@@ -132,7 +140,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                 if (item.isHit(axe[i], axe[i + 1])) {
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
-                                    it.remove();
+                                    //it.remove();
+                                    int s = Utils.getRand(splats.length);
+                                    item.setBitmap(splats[s]);
+                                    item.setYv(3);
+                                    item.setXv(item.getXv()/2);
+                                    item.setSpinv(1);
+                                    canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
                                     points += 5;
                                 }
                             }

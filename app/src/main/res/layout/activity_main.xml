@@ -7,10 +7,21 @@
     tools:context="com.quaap.fishberserker.MainActivity">
 
 
-    <TextView
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/scores" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scores" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/instpoints" />
+    </LinearLayout>
 
     <com.quaap.fishberserker.MainFishView
         android:layout_width="match_parent"
