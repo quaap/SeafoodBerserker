@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -70,9 +71,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final Bitmap[] splats = new Bitmap[2];
 
 
-    private String mText;
-
-
     private OnPointsListener onPointsListener;
 
 
@@ -116,9 +114,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             mBGPaint.setARGB(255, 255, 255, 255);
 
             mTextPaint = new Paint();
-            mTextPaint.setARGB(255, 255, 64, 64);
-            mTextPaint.setStrokeWidth(5);
+            mTextPaint.setColor(Color.BLACK);
+            mTextPaint.setShadowLayer(8,8,8,Color.WHITE);
             mTextPaint.setTextSize(90);
+
         }
     }
 
@@ -126,16 +125,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         this.onPointsListener = onPointsListener;
     }
 
-    private Bitmap mTextBitmap;
-    public void setText(String text) {
-        mText = text;
-        if (text ==null || text.trim().equals("")) {
-            mTextBitmap = null;
-        } else {
+    private final Object mTextLock = new Object();
+    private volatile String mText;
+    private long mTextStarted;
 
-            mTextBitmap = Bitmap.createBitmap(400,200, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(mTextBitmap);
-            c.drawText(text,0,0, mTextPaint);
+    public void setText(String text) {
+
+        synchronized (mTextLock) {
+            mText = text;
+            mTextStarted = System.currentTimeMillis();
         }
 
     }
@@ -253,6 +251,24 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 }
             }
         }
+
+        synchronized (mTextLock) {
+            if (mText!=null) {
+                float [] widths = new float[mText.length()];
+                mTextPaint.getTextWidths(mText, widths);
+                float sum = 0;
+                for (float w : widths) {
+                    sum += w;
+                }
+
+                canvas.drawText(mText, mWidth/2 - sum/2, mHeight/3 , mTextPaint);
+                if (System.currentTimeMillis() - mTextStarted > 3000) {
+                    mText = null;
+                }
+            }
+
+        }
+
 
     }
 

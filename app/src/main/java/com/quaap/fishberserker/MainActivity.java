@@ -40,6 +40,9 @@ public class MainActivity extends Activity  {
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
             public void onPoints(final int points, int hits) {
+                if (hits>2) {
+                    mMainFishView.setText("Combo Bonus!");
+                }
                 mPoints += points;
                 handler.post(new Runnable() {
                     @Override
@@ -47,6 +50,8 @@ public class MainActivity extends Activity  {
                         mPointsView.setText(mPoints + " " + points);
                     }
                 });
+
+
             }
 
             @Override
@@ -72,10 +77,17 @@ public class MainActivity extends Activity  {
         task = new TimerTask() {
             @Override
             public void run() {
-                mMainFishView.startWave(mWavenum++, 5000, 11);
+                mWavenum++;
+                mMainFishView.setText("Wave " + mWavenum);
+                mMainFishView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMainFishView.startWave(mWavenum, 5000, 11);
+                    }
+                }, 3000);
             }
         };
 
-        timer.schedule(task, 3000, 60000);
+        timer.schedule(task, 2000, 60000);
     }
 }
