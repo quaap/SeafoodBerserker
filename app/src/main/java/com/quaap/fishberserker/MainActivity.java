@@ -27,6 +27,7 @@ public class MainActivity extends Activity  {
     TimerTask task;
 
     private int mWavenum;
+    private App app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +98,7 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onPause() {
+        app.getSoundEffects().pauseBGMusic();
         task.cancel();
         mMainFishView.pause();
         super.onPause();
@@ -121,5 +123,7 @@ public class MainActivity extends Activity  {
         };
 
         timer.schedule(task, 2000, 60000);
+        app = App.getInstance(this);
+        app.getSoundEffects().playBGMusic(0);
     }
 }
