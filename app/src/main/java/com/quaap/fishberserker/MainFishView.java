@@ -175,7 +175,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 }
 
 
-                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis)) {
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis) && Utils.getRand(100)>82) {
                     spawnFish();
                 }
             } else {
