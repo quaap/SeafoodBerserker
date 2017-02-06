@@ -2,6 +2,7 @@ package com.quaap.fishberserker;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 
 /**
  * Created by tom on 2/3/17.
@@ -84,5 +85,25 @@ public class Utils {
         }
 
         return Bitmap.createBitmap(image, left, top, right - left + 1, bottom - top + 1);
+    }
+
+    public static AsyncTask async(final Runnable r) {
+        return async(r,false);
+    }
+    public static AsyncTask async(final Runnable r, boolean multi) {
+        AsyncTask<Void, Void, Void> at = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                r.run();
+                return null;
+            }
+        };
+        if (multi) {
+            at.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            at.execute();
+        }
+        return at;
+
     }
 }

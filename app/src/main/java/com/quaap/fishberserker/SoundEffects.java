@@ -23,7 +23,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -35,14 +34,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class SoundEffects  implements MediaPlayer.OnPreparedListener{
+public class SoundEffects {
 
     private SoundPool mSounds;
 
-    private MediaPlayer[] mBGMPlayer;
-    private int mSelectedBGM;
+    private int[] mBGMSongIds;
+    private MediaPlayer mBGMPlayer;
+
     private float mBGMVol = 1;
-    private volatile boolean mBGMPlayCalled = false;
+
 
     private Map<Integer,Integer> mSoundIds = new HashMap<>();
 
@@ -69,7 +69,10 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
 
     private volatile boolean mMute = false;
 
+    private Context mContext;
+
     public SoundEffects(final Context context) {
+        mContext = context;
         if (Build.VERSION.SDK_INT>=21) {
             AudioAttributes attributes = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_GAME)
@@ -86,51 +89,68 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
 
 
         final TypedArray songs = context.getResources().obtainTypedArray(R.array.songs);
-        mBGMPlayer = new MediaPlayer[songs.length()];
-        mSelectedBGM=0;
+        mBGMSongIds = new int[songs.length()];
+        for (int i=0; i<songs.length(); i++) {
+            mBGMSongIds[i] = songs.getResourceId(i, 0);
+        }
+        songs.recycle();
 
-        final Timer t = new Timer();
-        t.schedule(new TimerTask() {
+        Utils.async(new Runnable() {
             @Override
             public void run() {
-                for (int i=0; i<songs.length(); i++) {
-                    mBGMPlayer[i] = MediaPlayer.create(context, songs.getResourceId(i,0));
-                    mBGMPlayer[i].setOnPreparedListener(SoundEffects.this);
-                }
-                songs.recycle();
+
                 for (int i=0; i<soundFiles.length; i++) {
                     mSoundIds.put(i, mSounds.load(context, soundFiles[i],1));
                 }
                 mReady = true;
-                t.cancel();
             }
-        }, 10);
+        });
     }
 
-    public void playBGMusic(int which) {
-        pauseBGMusic();
-        mSelectedBGM=which;
-        mBGMPlayer[mSelectedBGM].start();
-        mBGMPlayCalled = true;
+    public int getBGMSongs() {
+        return mBGMSongIds.length;
+    }
+
+    public void playBGMusic(final int which) {
+        if (mBGMPlayer!=null) {
+            mBGMPlayer.release();
+        }
+
+        Utils.async(new Runnable() {
+            @Override
+            public void run() {
+                mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
+                mBGMPlayer.start();
+            }
+        });
     }
 
     public void pauseBGMusic() {
-        mBGMPlayCalled = false;
-        if (mBGMPlayer[mSelectedBGM].isPlaying()) {
-            mBGMPlayer[mSelectedBGM].pause();
+        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
+            mBGMPlayer.pause();
         }
     }
 
     public void restartBGMusic() {
         pauseBGMusic();
-        mBGMPlayer[mSelectedBGM].seekTo(0);
-        mBGMPlayer[mSelectedBGM].start();
-        mBGMPlayCalled = true;
+        if (mBGMPlayer!=null) {
+            mBGMPlayer.seekTo(0);
+            mBGMPlayer.start();
+        }
+    }
+
+    public void releaseBGM() {
+        if (mBGMPlayer!=null) {
+            pauseBGMusic();
+            mBGMPlayer.release();
+        }
     }
 
     public void setBGMusicVolume(float vol) {
-        mBGMVol = vol;
-        mBGMPlayer[mSelectedBGM].setVolume(mBGMVol,mBGMVol);
+        if (mBGMPlayer!=null) {
+            mBGMVol = vol;
+            mBGMPlayer.setVolume(mBGMVol, mBGMVol);
+        }
     }
 
     public void setBGMusicVolumeTemp(float vol, long timeoutmillis) {
@@ -210,16 +230,8 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
 
     public void release() {
         mSounds.release();
-        for (MediaPlayer m: mBGMPlayer) {
-            m.release();
-        }
+        releaseBGM();
     }
 
-    @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        Log.d("gg", "player prepared " + mediaPlayer.toString());
-        if (mBGMPlayCalled && !mBGMPlayer[mSelectedBGM].isPlaying()) {
-            mBGMPlayer[mSelectedBGM].start();
-        }
-    }
+
 }

@@ -98,7 +98,7 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onPause() {
-        app.getSoundEffects().pauseBGMusic();
+        app.getSoundEffects().releaseBGM();
         task.cancel();
         mMainFishView.pause();
         super.onPause();
