@@ -383,6 +383,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         if (mThread != null) mThread.unpauseRunning();
     }
 
+    public void end() {
+        if (mThread!=null) {
+            mThread.pauseRunning();
+            mThread.stopRunning();
+        }
+
+
+    }
 
 
     class RunThread extends Thread {

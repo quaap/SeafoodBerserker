@@ -63,12 +63,25 @@ public class MainActivity extends Activity  {
             @Override
             public void onMiss(int points) {
                 mLives--;
+                if (mLives<=0) {
+                    mMainFishView.setText("Game Over");
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMainFishView.end();
+
+                        }
+                    },500);
+                    mLives = 0;
+                }
+
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         showScores();
                     }
                 });
+
 
             }
         });
