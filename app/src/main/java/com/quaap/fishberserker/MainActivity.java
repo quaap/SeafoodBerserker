@@ -41,7 +41,7 @@ public class MainActivity extends Activity  {
         mLivesView = (TextView) findViewById(R.id.lives);
 
         mLives = 5;
-        mWavenum = 0;
+        mWavenum = 3;
 
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override

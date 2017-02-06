@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -42,7 +43,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public static final int CONFIG_HEIGHT = 1000;
     public static final int MIN_SWIPE = 40;
     public static final int SWIPE_OVERSHOOT = 20;
-    public static final int MAX_AXES_REPS = 10;
+    public static final int MAX_AXES_REPS = 15;
     public static final int AXE_TIMEOUT = 1000;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
@@ -239,19 +240,39 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
         synchronized (itemsInPlay) {
+
             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                 FlyingItem item = it.next();
                 item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
-                if (item.getY() > mHeight && item.getYv() > 0) {
+                if (item.getY() > mHeight && item.getYv() > 0 || item.getX()<0 || item.getX()>mWidth) {
                     if (!item.wasHit() && onPointsListener!=null) {
                         onPointsListener.onMiss(item.getValue());
                     }
                     it.remove();
                 } else {
+
                     item.draw(canvas);
                 }
             }
+
+            //remove some hit items early if too many;
+            if (itemsInPlay.size()>12) {
+                int num = 0;
+                for (Iterator<FlyingItem> it = itemsInPlay.listIterator(2); it.hasNext(); ) {
+                    FlyingItem item = it.next();
+                    if (item.wasHit()) {
+                        it.remove();
+                        if (num++>4) {
+                            break;
+                        }
+
+                    }
+                }
+                Log.d("f", "removed " + num + " items early");
+            }
         }
+
+
 
         synchronized (mTextLock) {
             if (mText!=null) {
@@ -307,6 +328,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             case MotionEvent.ACTION_MOVE:
 
                 if (System.currentTimeMillis() - starttime > AXE_TIMEOUT) {
+                    performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
                     return true;
                 }
 
