@@ -42,6 +42,7 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
     private MediaPlayer[] mBGMPlayer;
     private int mSelectedBGM;
     private float mBGMVol = 1;
+    private volatile boolean mBGMPlayCalled = false;
 
     private Map<Integer,Integer> mSoundIds = new HashMap<>();
 
@@ -110,9 +111,11 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
         pauseBGMusic();
         mSelectedBGM=which;
         mBGMPlayer[mSelectedBGM].start();
+        mBGMPlayCalled = true;
     }
 
     public void pauseBGMusic() {
+        mBGMPlayCalled = false;
         if (mBGMPlayer[mSelectedBGM].isPlaying()) {
             mBGMPlayer[mSelectedBGM].pause();
         }
@@ -122,6 +125,7 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
         pauseBGMusic();
         mBGMPlayer[mSelectedBGM].seekTo(0);
         mBGMPlayer[mSelectedBGM].start();
+        mBGMPlayCalled = true;
     }
 
     public void setBGMusicVolume(float vol) {
@@ -214,5 +218,8 @@ public class SoundEffects  implements MediaPlayer.OnPreparedListener{
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         Log.d("gg", "player prepared " + mediaPlayer.toString());
+        if (mBGMPlayCalled && !mBGMPlayer[mSelectedBGM].isPlaying()) {
+            mBGMPlayer[mSelectedBGM].start();
+        }
     }
 }
