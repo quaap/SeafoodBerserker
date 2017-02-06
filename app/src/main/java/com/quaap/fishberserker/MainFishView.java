@@ -43,6 +43,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public static final int MIN_SWIPE = 40;
     public static final int SWIPE_OVERSHOOT = 20;
     public static final int MAX_AXES_REPS = 10;
+    public static final int AXE_TIMEOUT = 1000;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
@@ -278,9 +279,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
         item.setXv(xv);
         if (xv<0) {
-            item.setX(Utils.getRand(mWidth/2) + mWidth/2);
+            item.setX(Utils.getRand(mWidth/2) + mWidth/2 - mWidth*.2);
         } else {
-            item.setX(Utils.getRand(mWidth/2));
+            item.setX(Utils.getRand(mWidth/2) + mWidth*.2);
         }
         item.setY(mHeight + 20);
         item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
@@ -305,26 +306,29 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
 
-                //if (System.currentTimeMillis() - starttime < 100) {
-                    double dx = x0 - x1;
-                    double dy = y0 - y1;
-                    double dist = Math.sqrt(dx * dx + dy * dy);
-                    //Log.d("f", e.getAction() + " " + speed);
-                    if (dist > MIN_SWIPE) {
-                        int num = SWIPE_OVERSHOOT;
-                        float[] axe = new float[num * 2];
+                if (System.currentTimeMillis() - starttime > AXE_TIMEOUT) {
+                    return true;
+                }
 
-                        int pos = 0;
-                        for (int ti = -num / 2; ti < 10 + num / 2; ti += 2) {
-                            float t = ti / 10f;
-                            int xt = (int) ((1 - t) * x0 + t * x1);
-                            int yt = (int) ((1 - t) * y0 + t * y1);
-                            axe[pos] = xt;
-                            axe[pos + 1] = yt;
-                            pos += 2;
-                        }
-                        mAxes.push(axe);
+                double dx = x0 - x1;
+                double dy = y0 - y1;
+                double dist = Math.sqrt(dx * dx + dy * dy);
+                //Log.d("f", e.getAction() + " " + speed);
+                if (dist > MIN_SWIPE) {
+                    int num = SWIPE_OVERSHOOT;
+                    float[] axe = new float[num * 2];
+
+                    int pos = 0;
+                    for (int ti = -num / 2; ti < 10 + num / 2; ti += 2) {
+                        float t = ti / 10f;
+                        int xt = (int) ((1 - t) * x0 + t * x1);
+                        int yt = (int) ((1 - t) * y0 + t * y1);
+                        axe[pos] = xt;
+                        axe[pos + 1] = yt;
+                        pos += 2;
                     }
+                    mAxes.push(axe);
+                }
                 //}
                 break;
 
@@ -335,7 +339,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
             case MotionEvent.ACTION_DOWN:
-                //starttime = System.currentTimeMillis();
+                starttime = System.currentTimeMillis();
 
         }
 

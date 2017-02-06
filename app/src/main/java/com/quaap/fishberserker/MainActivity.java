@@ -15,15 +15,18 @@ public class MainActivity extends Activity  {
     private MainFishView mMainFishView;
 
     private TextView mPointsView;
+    private TextView mdView;
+    private TextView mLivesView;
 
-    private volatile int mPoints;
+    private int mPoints;
+    private int mLives;
 
     final Handler handler = new Handler();
 
     final Timer timer = new Timer();
     TimerTask task;
 
-    int mWavenum = 0;
+    private int mWavenum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,11 +38,14 @@ public class MainActivity extends Activity  {
 
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
         mPointsView = (TextView) findViewById(R.id.scores);
+        mLivesView = (TextView) findViewById(R.id.lives);
 
+        mLives = 5;
+        mWavenum = 0;
 
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
-            public void onPoints(final int points, int hits) {
+            public void onPoints(int points, int hits) {
                 if (hits>2) {
                     mMainFishView.setText("Combo Bonus!");
                 }
@@ -47,7 +53,7 @@ public class MainActivity extends Activity  {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mPointsView.setText(mPoints + " " + points);
+                        showScores();
                     }
                 });
 
@@ -56,12 +62,25 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onMiss(int points) {
+                mLives--;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showScores();
+                    }
+                });
 
             }
         });
 
 
     }
+
+    private void showScores() {
+        mPointsView.setText(mPoints + "");
+        mLivesView.setText(mLives + " Lives");
+    }
+
 
     @Override
     protected void onPause() {
