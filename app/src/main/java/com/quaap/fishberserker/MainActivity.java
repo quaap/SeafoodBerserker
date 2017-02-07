@@ -86,6 +86,13 @@ public class MainActivity extends Activity  {
                     }
                 });
             }
+
+            @Override
+            public void onBoom() {
+                mSounds.playBad();
+                mMainFishView.setText("Boom");
+                onMiss(100);
+            }
         });
 
 

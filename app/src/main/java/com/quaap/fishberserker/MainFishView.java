@@ -72,6 +72,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final Bitmap[] splats = new Bitmap[2];
 
+    private final Bitmap[] anchor = new Bitmap[1];
+
 
     private OnPointsListener onPointsListener;
 
@@ -96,6 +98,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
             splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
+            anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor);
 
             final SurfaceHolder holder = getHolder();
             holder.addCallback(this);
@@ -118,7 +121,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             mTextPaint = new Paint();
             mTextPaint.setColor(Color.BLACK);
             mTextPaint.setShadowLayer(8,8,8,Color.WHITE);
-            mTextPaint.setTextSize(90);
+            mTextPaint.setTextSize(80);
 
         }
     }
@@ -177,7 +180,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
                 if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis) && Utils.getRand(100)>82) {
-                    spawnFish();
+                    FlyingItem item = spawnFish();
+                    if (Utils.getRand(0,100)>95) {
+                        item.setBitmap(anchor[0]);
+                        item.setBoom(true);
+                    }
                 }
             } else {
                 mWaveGoing = false;
@@ -209,6 +216,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                             for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
                                 FlyingItem item = it.next();
                                 if (item.isHit(axe[i], axe[i + 1])) {
+                                    if (item.isBoom()) {
+                                        if (onPointsListener!=null) onPointsListener.onBoom();
+                                        it.remove();
+                                        break;
+                                    }
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
                                     //it.remove();
@@ -245,7 +257,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 FlyingItem item = it.next();
                 item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
                 if (item.getY() > mHeight && item.getYv() > 0 || item.getX()<0 || item.getX()>mWidth) {
-                    if (!item.wasHit() && onPointsListener!=null) {
+                    if (!item.isBoom() && !item.wasHit() && onPointsListener!=null) {
                         onPointsListener.onMiss(item.getValue());
                     }
                     it.remove();
@@ -284,7 +296,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 }
 
                 canvas.drawText(mText, mWidth/2 - sum/2, mHeight/3 , mTextPaint);
-                if (System.currentTimeMillis() - mTextStarted > 3000) {
+                if (System.currentTimeMillis() - mTextStarted > 1500) {
                     mText = null;
                 }
             }
@@ -294,7 +306,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     }
 
-    private void spawnFish() {
+    private FlyingItem spawnFish() {
         FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
         double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
@@ -311,6 +323,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         synchronized (itemsInPlay) {
             itemsInPlay.add(item);
         }
+        return item;
     }
 
     private volatile Stack<float[]> mAxes = new Stack<>();
@@ -493,6 +506,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public interface OnPointsListener {
         void onPoints(int points, int hits);
         void onMiss(int points);
+        void onBoom();
     }
 
 

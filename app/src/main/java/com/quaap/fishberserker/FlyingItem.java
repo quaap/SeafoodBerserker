@@ -51,6 +51,7 @@ public class FlyingItem {
     private int mValue;
     private String mText;
 
+    private boolean mBoom;
 
     public FlyingItem(Bitmap bitmap) {
         this(bitmap, 0, 0, 0, 0, 0);
@@ -238,5 +239,13 @@ public class FlyingItem {
 
     public void setSpinv(double spinv) {
         mSpinv = spinv;
+    }
+
+    public boolean isBoom() {
+        return mBoom;
+    }
+
+    public void setBoom(boolean boom) {
+        this.mBoom = boom;
     }
 }
