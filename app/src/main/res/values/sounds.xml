@@ -2,5 +2,48 @@
 <resources>
     <array name="songs">
         <item>@raw/grug</item>
+        <item>@raw/grugriffloop</item>
+        <item>@raw/dundunquick</item>
+        <item>@raw/droneriffloop</item>
+        <item>@raw/chugloop</item>
+        <item>@raw/chugloopdrums</item>
+        <item>@raw/drone1</item>
     </array>
+
+
+
+    <array name="sounds">
+        <item>@raw/bad1</item>
+        <item>@raw/bad2</item>
+        <item>@raw/bad3</item>
+        <item>@raw/good1</item>
+        <item>@raw/down1</item>
+        <item>@raw/up1</item>
+        <item>@raw/dundunquick</item>
+        <item>@raw/prog1</item>
+
+    </array>
+
+    <string-array name="sounds_usage">
+        <item>bad</item>
+        <item>bad</item>
+        <item>bad</item>
+        <item>good</item>
+        <item>down</item>
+        <item>good</item>
+        <item>better</item>
+        <item>best</item>
+    </string-array>
+
+    <integer-array name="sounds_volumes">
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+    </integer-array>
+
 </resources>

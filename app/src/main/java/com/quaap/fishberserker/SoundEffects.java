@@ -27,8 +27,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -46,22 +47,13 @@ public class SoundEffects {
 
     private Map<Integer,Integer> mSoundIds = new HashMap<>();
 
-    private static final int GOODBING = 0;
-    private static final int BADBING = 1;
-    private static final int HIGHCLICK = 2;
-    private static final int LOWCLICK = 3;
-    private static final int BABA = 4;
-    private static final int DRUMROLLHIT = 5;
-    private static final int HIT = 6;
 
-    private final int [] soundFiles = {
 
-    };
-    private final float [] soundVolumes = {
-            .6f,
-            .4f,
-            .5f,
-    };
+    private int [] soundFiles;
+
+    private float [] soundVolumes;
+    private String [] soundUses;
+
 
     private SharedPreferences appPreferences;
 
@@ -80,20 +72,31 @@ public class SoundEffects {
                     .build();
             mSounds = new SoundPool.Builder()
                     .setAudioAttributes(attributes)
-                    .setMaxStreams(4)
+                    .setMaxStreams(5)
                     .build();
         } else {
-            mSounds = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+            mSounds = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         }
         appPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
 
-        final TypedArray songs = context.getResources().obtainTypedArray(R.array.songs);
-        mBGMSongIds = new int[songs.length()];
-        for (int i=0; i<songs.length(); i++) {
-            mBGMSongIds[i] = songs.getResourceId(i, 0);
+        mBGMSongIds = getResIdArray(context, R.array.songs);
+
+        soundFiles = getResIdArray(context, R.array.sounds);
+
+        int [] vols =  context.getResources().getIntArray(R.array.sounds_volumes);
+        soundVolumes = new float[soundFiles.length];
+        for (int i=0; i<vols.length; i++) {
+            soundVolumes[i] = vols[i]/100.0f;
         }
-        songs.recycle();
+
+        soundUses = new String[soundFiles.length];
+        String [] uses =  context.getResources().getStringArray(R.array.sounds_usage);
+
+        for (int i=0; i<uses.length; i++) {
+            soundUses[i] = uses[i];
+        }
+
 
         Utils.async(new Runnable() {
             @Override
@@ -107,20 +110,39 @@ public class SoundEffects {
         });
     }
 
+    private int[] getResIdArray(Context context, int id) {
+        final TypedArray idsarr = context.getResources().obtainTypedArray(id);
+        int [] ids = new int[idsarr.length()];
+        for (int i=0; i<idsarr.length(); i++) {
+            ids[i] = idsarr.getResourceId(i, 0);
+        }
+        idsarr.recycle();
+        return ids;
+    }
+
     public int getBGMSongs() {
         return mBGMSongIds.length;
     }
 
+    public void playRandomBGMusic() {
+        playBGMusic(Utils.getRand(mBGMSongIds.length));
+
+    }
     public void playBGMusic(final int which) {
-        if (mBGMPlayer!=null) {
-            mBGMPlayer.release();
-        }
 
         Utils.async(new Runnable() {
             @Override
             public void run() {
+                if (mBGMPlayer!=null) {
+                    pauseBGMusic();
+                    mBGMPlayer.release();
+                }
+
+
                 mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
                 mBGMPlayer.start();
+                mBGMPlayer.setLooping(true);
+                setBGMusicVolume(.4f);
             }
         });
     }
@@ -136,6 +158,7 @@ public class SoundEffects {
         if (mBGMPlayer!=null) {
             mBGMPlayer.seekTo(0);
             mBGMPlayer.start();
+
         }
     }
 
@@ -145,7 +168,12 @@ public class SoundEffects {
             mBGMPlayer.release();
         }
     }
-
+    public void deltaBGMusicVolume(float volchange) {
+        float newvol = mBGMVol+volchange;
+        if (newvol>=0 || newvol <=1) {
+            setBGMusicVolume(newvol);
+        }
+    }
     public void setBGMusicVolume(float vol) {
         if (mBGMPlayer!=null) {
             mBGMVol = vol;
@@ -179,15 +207,20 @@ public class SoundEffects {
         return mMute;
     }
 
-    private void play(int soundKey) {
-        play(soundKey, 1);
+    private void loop(int soundKey, int loop) {
+        play(soundKey, 1, loop);
     }
-    private void play(int soundKey, float speed) {
+
+    private void play(int soundKey) {
+        play(soundKey, 1, 0);
+    }
+    private void play(int soundKey, float speed, int loop) {
         try {
             if (isReady() && !mMute && appPreferences.getBoolean("use_sound_effects", true)) {
 
                 float vol = soundVolumes[soundKey] + getRandHundreth();
-                mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, 0, speed + getRandHundreth()/2);
+                mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, loop, speed);
+                Log.d("sfx", soundKey + " key");
             }
         } catch (Exception e) {
             Log.e("SoundEffects", "Error playing " + soundKey, e);
@@ -195,37 +228,47 @@ public class SoundEffects {
     }
 
     public void playGood() {
-        play(GOODBING);
+        List<Integer> goods = new ArrayList<>();
+        for (int i=0; i<soundUses.length; i++) {
+            if (soundUses[i].equals("good")) {
+                goods.add(i);
+            }
+        }
+
+        play(goods.get(Utils.getRand(goods.size())));
     }
 
     public void playBad() {
-        play(BADBING);
+        List<Integer> bads = new ArrayList<>();
+        for (int i=0; i<soundUses.length; i++) {
+            if (soundUses[i].equals("bad")) {
+                bads.add(i);
+            }
+        }
+
+        play(bads.get(Utils.getRand(bads.size())));
     }
 
-    public void playHighClick() {
-        play(HIGHCLICK);
+
+    public void playLoop() {
+        List<Integer> loops = new ArrayList<>();
+        for (int i=0; i<soundUses.length; i++) {
+            if (soundUses[i].equals("loop")) {
+                loops.add(i);
+            }
+        }
+
+        loop(loops.get(Utils.getRand(loops.size())), Utils.getRandInt(1,4));
     }
 
-    public void playLowClick() {
-        play(LOWCLICK);
-    }
-
-    public void playBaba() {
-        play(BABA);
-    }
+//    public boolean isLooping() {
+//       // mSounds.
+//    }
 
     private float getRandHundreth() {
         return (float)((Math.random()-.5)/10);
     }
-    public void playHit1() {
-        play(HIT, 1);
-    }
-    public void playHit2() {
-        play(HIT, 1.2f);
-    }
-    public void playHit3() {
-        play(HIT, 1.5f);
-    }
+
 
 
     public void release() {

@@ -28,6 +28,7 @@ public class MainActivity extends Activity  {
 
     private int mWavenum;
     private App app;
+    private SoundEffects mSounds;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,11 +43,12 @@ public class MainActivity extends Activity  {
         mLivesView = (TextView) findViewById(R.id.lives);
 
         mLives = 5;
-        mWavenum = 3;
+        mWavenum = 0;
 
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
             public void onPoints(int points, int hits) {
+                mSounds.playGood();
                 if (hits>2) {
                     mMainFishView.setText("Combo Bonus!");
                 }
@@ -63,6 +65,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onMiss(int points) {
+                mSounds.playBad();
                 mLives--;
                 if (mLives<=0) {
                     mMainFishView.setText("Game Over");
@@ -82,8 +85,6 @@ public class MainActivity extends Activity  {
                         showScores();
                     }
                 });
-
-
             }
         });
 
@@ -117,6 +118,7 @@ public class MainActivity extends Activity  {
                     @Override
                     public void run() {
                         mMainFishView.startWave(mWavenum, 5000, 11);
+                        mSounds.playRandomBGMusic();
                     }
                 }, 3500);
             }
@@ -124,6 +126,7 @@ public class MainActivity extends Activity  {
 
         timer.schedule(task, 2000, 60000);
         app = App.getInstance(this);
-        app.getSoundEffects().playBGMusic(0);
+        mSounds = app.getSoundEffects();
+        //app.getSoundEffects().playBGMusic(0);
     }
 }

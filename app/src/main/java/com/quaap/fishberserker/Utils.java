@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by tom on 2/3/17.
  * <p>
@@ -87,9 +90,35 @@ public class Utils {
         return Bitmap.createBitmap(image, left, top, right - left + 1, bottom - top + 1);
     }
 
+
+
+    public static synchronized TimerTask asyncRepeat(final Runnable r, final int repeatmillis, final int times) {
+        final int[] counter = new int[1];
+        counter[0]=0;
+        final Timer t = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    if (counter[0]++ >= times) {
+                        t.cancel();
+                        return;
+                    }
+                    r.run();
+                } catch (Exception | Error e) {
+                    t.cancel();
+                }
+            }
+        };
+        t.schedule(task, repeatmillis, repeatmillis);
+
+        return task;
+    }
+
     public static AsyncTask async(final Runnable r) {
         return async(r,false);
     }
+
     public static AsyncTask async(final Runnable r, boolean multi) {
         AsyncTask<Void, Void, Void> at = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -104,6 +133,5 @@ public class Utils {
             at.execute();
         }
         return at;
-
     }
 }
