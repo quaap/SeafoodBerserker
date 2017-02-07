@@ -62,6 +62,8 @@ public class SoundEffects {
 
     private volatile boolean mMute = false;
 
+    private float mBGMVolume = .3f;
+
     private Context mContext;
 
     public SoundEffects(final Context context) {
@@ -144,48 +146,33 @@ public class SoundEffects {
                 }
 
                 mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
-                mBGMPlayerNext = prepareNext(which);
+                mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
+
                 mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
+                mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
 
-                mBGMPlayer.setOnCompletionListener(getOnComplete(which));
+                mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
+                mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
+
+                mBGMPlayer.setOnCompletionListener(oncomplete);
+                mBGMPlayerNext.setOnCompletionListener(oncomplete);
+
                 mBGMPlayer.start();
-                setBGMusicVolume(.4f);
-
-
-
 
             }
         });
     }
 
-    private MediaPlayer prepareNext(final int which) {
-        MediaPlayer pn = MediaPlayer.create(mContext, mBGMSongIds[which]);
-//        mBGMPlayerNext.start();
-//
-//        mBGMPlayerNext.pause();
-        pn.setOnCompletionListener(getOnComplete(which));
-        return pn;
-
-    }
-
-    private MediaPlayer.OnCompletionListener getOnComplete(final int which) {
-
-        return new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-               // mBGMPlayerNext.start();
-                mBGMPlayer = mBGMPlayerNext;
-                mediaPlayer.release();
-                mBGMPlayerNext = prepareNext(which);
-                mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
-
-                setBGMusicVolume(.4f);
-
-            }
-        };
 
 
-    }
+
+    private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            mediaPlayer.seekTo(0);
+        }
+    };
+
 
     public void pauseBGMusic() {
         if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
@@ -205,11 +192,14 @@ public class SoundEffects {
     public void releaseBGM() {
         if (mBGMPlayer!=null) {
             mBGMPlayer.release();
+            mBGMPlayer=null;
         }
         if (mBGMPlayerNext!=null) {
             mBGMPlayerNext.release();
+            mBGMPlayerNext=null;
         }
     }
+
     public void deltaBGMusicVolume(float volchange) {
         float newvol = mBGMVol+volchange;
         if (newvol>=0 || newvol <=1) {
@@ -217,9 +207,12 @@ public class SoundEffects {
         }
     }
     public void setBGMusicVolume(float vol) {
+        mBGMVol = vol;
         if (mBGMPlayer!=null) {
-            mBGMVol = vol;
             mBGMPlayer.setVolume(mBGMVol, mBGMVol);
+        }
+        if (mBGMPlayerNext!=null) {
+            mBGMPlayerNext.setVolume(mBGMVol, mBGMVol);
         }
     }
 

@@ -311,10 +311,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
         item.setXv(xv);
+
+        int xmid = (int)(mWidth/2*.8);
+
         if (xv<0) {
-            item.setX(Utils.getRand(mWidth/2) + mWidth/2 - mWidth*.2);
+            item.setX(mWidth - Utils.getRand(xmid) - 20);
         } else {
-            item.setX(Utils.getRand(mWidth/2) + mWidth*.2);
+            item.setX(Utils.getRand(xmid) + 20);
         }
         item.setY(mHeight + 20);
         item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));

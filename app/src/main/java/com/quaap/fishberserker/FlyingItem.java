@@ -109,6 +109,11 @@ public class FlyingItem {
         int width2 = mBitmap.getWidth()/2;
         int height2 = mBitmap.getHeight()/2;
 
+        if (isBoom()) {
+            width2 *=.8;
+            height2 *=.8;
+        }
+
         return (x > mX-width2 && x < mX+width2 && y > mY-height2 && y < mY+height2);
     }
 
