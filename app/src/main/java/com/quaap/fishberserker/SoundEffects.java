@@ -41,6 +41,7 @@ public class SoundEffects {
 
     private int[] mBGMSongIds;
     private MediaPlayer mBGMPlayer;
+    private MediaPlayer mBGMPlayerNext;
 
     private float mBGMVol = 1;
 
@@ -133,18 +134,57 @@ public class SoundEffects {
         Utils.async(new Runnable() {
             @Override
             public void run() {
+
                 if (mBGMPlayer!=null) {
-                    pauseBGMusic();
+                    //pauseBGMusic();
                     mBGMPlayer.release();
                 }
-
+                if (mBGMPlayerNext!=null) {
+                    mBGMPlayerNext.release();
+                }
 
                 mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
+                mBGMPlayerNext = prepareNext(which);
+                mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
+
+                mBGMPlayer.setOnCompletionListener(getOnComplete(which));
                 mBGMPlayer.start();
-                mBGMPlayer.setLooping(true);
                 setBGMusicVolume(.4f);
+
+
+
+
             }
         });
+    }
+
+    private MediaPlayer prepareNext(final int which) {
+        MediaPlayer pn = MediaPlayer.create(mContext, mBGMSongIds[which]);
+//        mBGMPlayerNext.start();
+//
+//        mBGMPlayerNext.pause();
+        pn.setOnCompletionListener(getOnComplete(which));
+        return pn;
+
+    }
+
+    private MediaPlayer.OnCompletionListener getOnComplete(final int which) {
+
+        return new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+               // mBGMPlayerNext.start();
+                mBGMPlayer = mBGMPlayerNext;
+                mediaPlayer.release();
+                mBGMPlayerNext = prepareNext(which);
+                mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
+
+                setBGMusicVolume(.4f);
+
+            }
+        };
+
+
     }
 
     public void pauseBGMusic() {
@@ -164,8 +204,10 @@ public class SoundEffects {
 
     public void releaseBGM() {
         if (mBGMPlayer!=null) {
-            pauseBGMusic();
             mBGMPlayer.release();
+        }
+        if (mBGMPlayerNext!=null) {
+            mBGMPlayerNext.release();
         }
     }
     public void deltaBGMusicVolume(float volchange) {

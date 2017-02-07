@@ -90,6 +90,10 @@ public class Utils {
         return Bitmap.createBitmap(image, left, top, right - left + 1, bottom - top + 1);
     }
 
+    public static synchronized TimerTask asyncDelay(final Runnable r, final int delaymillis) {
+
+        return asyncRepeat(r,delaymillis,1);
+    }
 
 
     public static synchronized TimerTask asyncRepeat(final Runnable r, final int repeatmillis, final int times) {
