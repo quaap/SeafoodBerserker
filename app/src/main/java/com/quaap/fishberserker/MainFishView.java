@@ -118,7 +118,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
             splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
             anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor_sm);
-            axes[0] = BitmapFactory.decodeResource(getResources(), R.drawable.axe);
+            axes[0] = BitmapFactory.decodeResource(getResources(), R.drawable.axe2);
             bgs[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sea);
             fgtops[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sail);
             fgbottoms[0] = BitmapFactory.decodeResource(getResources(), R.drawable.shipside2);
@@ -250,11 +250,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         pareDeadItems();
 
-        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2 + (int)(shipBobSin*-4),null);
+        drawBottomFG(canvas, shipBobSin);
 
         drawFallingItems(canvas);
 
-        canvas.drawBitmap(fgtopsScaled[0],(int)(shipBobSin*3), -fgtopsScaled[0].getHeight()/2 + (int)(shipBobSin*-5),null);
+        drawTopFG(canvas, shipBobSin);
 
         drawScoreboard(canvas);
 
@@ -262,6 +262,28 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         drawPopupText(canvas);
 
+    }
+
+    private void drawTopFG(Canvas canvas, double shipBobSin) {
+        int bobfactor = 7;
+
+       // int top = Math.min(fgtopsScaled[0].getHeight()-bobfactor, mHeight/6);
+
+        int top = -bobfactor;
+        int diff = fgtopsScaled[0].getHeight() - mHeight/6;
+        if (diff>0) {
+            top -= diff;
+        }
+
+        canvas.drawBitmap(fgtopsScaled[0],(int)(shipBobSin*3), top + (int)(shipBobSin*bobfactor),null);
+    }
+
+    private void drawBottomFG(Canvas canvas, double shipBobSin) {
+        int bobfactor = 6;
+
+        int top = Math.min(fgbottomsScaled[0].getHeight()-bobfactor, mHeight/6);
+
+        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - top + (int)(shipBobSin*-bobfactor),null);
     }
 
     private void drawBackground(Canvas canvas, double shipBobSin) {

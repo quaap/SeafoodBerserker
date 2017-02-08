@@ -25,7 +25,7 @@ public class EntryActivity extends Activity {
 
     @Override
     protected void onPause() {
-        s.pauseBGMusic();
+        //s.pauseBGMusic();
         s.releaseBGM();
         super.onPause();
     }
@@ -34,7 +34,12 @@ public class EntryActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        s.playBGMusic(0);
+        findViewById(R.id.start_game).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                s.playBGMusic(0);
+            }
+        },1000);
     }
 
     @Override
