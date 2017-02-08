@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -83,6 +84,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final Bitmap[] fgtopsScaled = new Bitmap[1];
     private final Bitmap[] fgbottomsScaled = new Bitmap[1];
 
+    Matrix mSpinMatrix = new Matrix();
 
     private OnPointsListener onPointsListener;
 
@@ -204,21 +206,39 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
+
+    private FlyingItem spawnFish() {
+        FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
+
+        double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
+        item.setXv(xv);
+
+        int xmid = (int)(mWidth/2*.8);
+
+        if (xv<0) {
+            item.setX(mWidth - Utils.getRand(xmid) - 20);
+        } else {
+            item.setX(Utils.getRand(xmid) + 20);
+        }
+        item.setY(mHeight + 20);
+        item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
+        item.setSpinv((Math.random()-.5)*45);
+
+        synchronized (itemsInPlay) {
+            itemsInPlay.add(item);
+        }
+        return item;
+    }
+
+
+    private double mSpin = 0;
     private void doDraw(final Canvas canvas, long ticks) {
 
         spawnAsNeeded();
-//        if (itemsInPlay.size()< MAX_FLY && Math.random()>SPAWN_CHANCE) {
-//            spawnFish();
-//        }
 
-        //canvas.drawPaint(mBGPaint);
-//        int bgw = bgs[0].getWidth();
-//        int bgh = bgs[0].getHeight();
-//        int bgw2 = bgw/bgh*mHeight;
-//
-//        Rect src = new Rect(0,0,bgw,bgh);
-//        Rect dest = new Rect(0,0, bgw2, mHeight);
-        canvas.drawBitmap(bgsScaled[0],0,0, null);
+        mSpin+=.08;
+
+        canvas.drawBitmap(bgsScaled[0],0,(int)(Math.sin(mSpin)*10), null);
 
         int times = 0;
         int points = 0;
@@ -280,7 +300,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         onPointsListener.onMiss(item.getValue());
                     }
                     it.remove();
-                } else {
+                } else if (item.getYv()<=0 || item.wasHit() || item.isBoom()){
 
                     item.draw(canvas);
                 }
@@ -304,8 +324,19 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
 
-        canvas.drawBitmap(fgtops[0],0, -fgtops[0].getHeight()/2,null);
-        canvas.drawBitmap(fgbottoms[0],0, mHeight - fgbottoms[0].getHeight()/2,null);
+        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2,null);
+
+        //draw items coming down here so they'll fall over bottem foreground.
+        for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+            FlyingItem item = it.next();
+
+            if (item.getYv()>0 && !item.wasHit() && !item.isBoom()){
+                item.draw(canvas);
+            }
+        }
+        canvas.drawBitmap(fgtopsScaled[0],0, -fgtopsScaled[0].getHeight()/2,null);
+
+
 
         synchronized (mTextLock) {
             if (mText!=null) {
@@ -325,29 +356,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
 
-    }
-
-    private FlyingItem spawnFish() {
-        FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
-
-        double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
-        item.setXv(xv);
-
-        int xmid = (int)(mWidth/2*.8);
-
-        if (xv<0) {
-            item.setX(mWidth - Utils.getRand(xmid) - 20);
-        } else {
-            item.setX(Utils.getRand(xmid) + 20);
-        }
-        item.setY(mHeight + 20);
-        item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
-        item.setSpinv((Math.random()-.5)*45);
-
-        synchronized (itemsInPlay) {
-            itemsInPlay.add(item);
-        }
-        return item;
     }
 
     private volatile Stack<float[]> mAxes = new Stack<>();
@@ -412,6 +420,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         mThread = new RunThread(surfaceHolder);
+        mThread.start();
     }
 
     @Override
@@ -429,16 +438,44 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             Rect dest = new Rect(0, 0, bgw2, mHeight);
 
             bgsScaled[b] = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-            Canvas c = new Canvas(bgsScaled[0]);
+            Canvas c = new Canvas(bgsScaled[b]);
             c.drawBitmap(bgs[b], src, dest, null);
         }
 
-        Log.d("dimen", mWidth + "x" + mHeight);
-        if (mThread!=null) {
-            if (!mThread.isRunning()) {
-                mThread.start();
-            }
+
+        for (int b=0;b<fgtops.length; b++) {
+            int bgw = fgtops[b].getWidth();
+            int bgh = fgtops[b].getHeight();
+            int bgh2 = (int) (bgh / (double) bgw * mWidth);
+
+            Rect src = new Rect(0, 0, bgw, bgh);
+            Rect dest = new Rect(0, 0, mWidth, bgh2);
+
+            fgtopsScaled[b] = Bitmap.createBitmap(mWidth, bgh2, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(fgtopsScaled[b]);
+            c.drawBitmap(fgtops[b], src, dest, null);
         }
+
+        for (int b=0;b<fgbottoms.length; b++) {
+            int bgw = fgbottoms[b].getWidth();
+            int bgh = fgbottoms[b].getHeight();
+            int bgh2 = (int) (bgh / (double) bgw * mWidth);
+
+            Rect src = new Rect(0, 0, bgw, bgh);
+            Rect dest = new Rect(0, 0, mWidth, bgh2);
+
+            fgbottomsScaled[b] = Bitmap.createBitmap(mWidth, bgh2, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(fgbottomsScaled[b]);
+            c.drawBitmap(fgbottoms[b], src, dest, null);
+        }
+
+
+        Log.d("dimen", mWidth + "x" + mHeight);
+//        if (mThread!=null) {
+//            if (!mThread.isRunning()) {
+//                mThread.start();
+//            }
+//        }
     }
 
     @Override

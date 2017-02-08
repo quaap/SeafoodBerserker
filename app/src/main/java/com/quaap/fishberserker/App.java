@@ -27,6 +27,7 @@ public class App extends Application {
     private SoundEffects mSoundEffects;
 
 
+
     public SoundEffects getSoundEffects() {
         return mSoundEffects;
     }
@@ -43,5 +44,9 @@ public class App extends Application {
     public void onTerminate() {
         mSoundEffects.release();
         super.onTerminate();
+    }
+
+    public boolean check(Context context) {
+        return context.getApplicationContext() == this.getApplicationContext();
     }
 }

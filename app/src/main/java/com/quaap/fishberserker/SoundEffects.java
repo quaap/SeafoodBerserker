@@ -23,6 +23,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -157,6 +158,10 @@ public class SoundEffects {
                 mBGMPlayer.setOnCompletionListener(oncomplete);
                 mBGMPlayerNext.setOnCompletionListener(oncomplete);
 
+                mBGMPlayer.setOnErrorListener(onerr);
+                mBGMPlayerNext.setOnErrorListener(onerr);
+
+
                 mBGMPlayer.start();
 
             }
@@ -164,12 +169,36 @@ public class SoundEffects {
     }
 
 
-
+    Handler h = new Handler();
 
     private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
+            if (!((App)mContext.getApplicationContext()).check(mContext)) {
+                mediaPlayer.release();
+                mBGMPlayer.release();
+                mBGMPlayerNext.release();
+                return;
+            }
+            h.post(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
             mediaPlayer.seekTo(0);
+        }
+    };
+
+    private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+            mediaPlayer.release();
+            mBGMPlayer.release();
+            mBGMPlayerNext.release();
+            mBGMPlayer = null;
+            mBGMPlayerNext = null;
+            return false;
         }
     };
 
@@ -315,8 +344,8 @@ public class SoundEffects {
 
 
     public void release() {
-        mSounds.release();
         releaseBGM();
+        mSounds.release();
     }
 
 
