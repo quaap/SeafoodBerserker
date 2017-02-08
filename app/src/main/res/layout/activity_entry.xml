@@ -16,5 +16,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/start_game"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textSize="30sp"
+        android:padding="16dp" />
 </RelativeLayout>

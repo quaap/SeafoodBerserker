@@ -40,11 +40,6 @@ public class SoundEffects {
 
     private SoundPool mSounds;
 
-    private int[] mBGMSongIds;
-    private MediaPlayer mBGMPlayer;
-    private MediaPlayer mBGMPlayerNext;
-
-    private float mBGMVol = 1;
 
 
     private Map<Integer,Integer> mSoundIds = new HashMap<>();
@@ -63,9 +58,8 @@ public class SoundEffects {
 
     private volatile boolean mMute = false;
 
-    private float mBGMVolume = .3f;
-
     private Context mContext;
+
 
     public SoundEffects(final Context context) {
         mContext = context;
@@ -84,7 +78,6 @@ public class SoundEffects {
         appPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
 
-        mBGMSongIds = getResIdArray(context, R.array.songs);
 
         soundFiles = getResIdArray(context, R.array.sounds);
 
@@ -112,157 +105,8 @@ public class SoundEffects {
                 mReady = true;
             }
         });
-    }
-
-    private int[] getResIdArray(Context context, int id) {
-        final TypedArray idsarr = context.getResources().obtainTypedArray(id);
-        int [] ids = new int[idsarr.length()];
-        for (int i=0; i<idsarr.length(); i++) {
-            ids[i] = idsarr.getResourceId(i, 0);
-        }
-        idsarr.recycle();
-        return ids;
-    }
-
-    public int getBGMSongs() {
-        return mBGMSongIds.length;
-    }
-
-    public void playRandomBGMusic() {
-        playBGMusic(Utils.getRand(mBGMSongIds.length));
-
-    }
-    public void playBGMusic(final int which) {
-
-        Utils.async(new Runnable() {
-            @Override
-            public void run() {
-
-                if (mBGMPlayer!=null) {
-                    //pauseBGMusic();
-                    mBGMPlayer.release();
-                }
-                if (mBGMPlayerNext!=null) {
-                    mBGMPlayerNext.release();
-                }
-
-                mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
-                mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
-
-                mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
-                mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
-
-                mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
-                mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
-
-                mBGMPlayer.setOnCompletionListener(oncomplete);
-                mBGMPlayerNext.setOnCompletionListener(oncomplete);
-
-                mBGMPlayer.setOnErrorListener(onerr);
-                mBGMPlayerNext.setOnErrorListener(onerr);
 
 
-                mBGMPlayer.start();
-
-            }
-        });
-    }
-
-
-    Handler h = new Handler();
-
-    private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mediaPlayer) {
-            if (!((App)mContext.getApplicationContext()).check(mContext)) {
-                mediaPlayer.release();
-                mBGMPlayer.release();
-                mBGMPlayerNext.release();
-                return;
-            }
-            h.post(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-            mediaPlayer.seekTo(0);
-        }
-    };
-
-    private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
-        @Override
-        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-            mediaPlayer.release();
-            mBGMPlayer.release();
-            mBGMPlayerNext.release();
-            mBGMPlayer = null;
-            mBGMPlayerNext = null;
-            return false;
-        }
-    };
-
-
-    public void pauseBGMusic() {
-        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
-            mBGMPlayer.pause();
-        }
-    }
-
-    public void restartBGMusic() {
-        pauseBGMusic();
-        if (mBGMPlayer!=null) {
-            mBGMPlayer.seekTo(0);
-            mBGMPlayer.start();
-
-        }
-    }
-
-    public void releaseBGM() {
-        if (mBGMPlayer!=null) {
-            try {
-                mBGMPlayer.setNextMediaPlayer(null);
-                mBGMPlayer.stop();
-            } catch( Exception e) { };
-            mBGMPlayer.release();
-            mBGMPlayer=null;
-        }
-        if (mBGMPlayerNext!=null) {
-            try {
-                mBGMPlayerNext.setNextMediaPlayer(null);
-                mBGMPlayerNext.stop();
-            } catch( Exception e) { };
-            mBGMPlayerNext.release();
-            mBGMPlayerNext=null;
-        }
-    }
-
-    public void deltaBGMusicVolume(float volchange) {
-        float newvol = mBGMVol+volchange;
-        if (newvol>=0 || newvol <=1) {
-            setBGMusicVolume(newvol);
-        }
-    }
-    public void setBGMusicVolume(float vol) {
-        mBGMVol = vol;
-        if (mBGMPlayer!=null) {
-            mBGMPlayer.setVolume(mBGMVol, mBGMVol);
-        }
-        if (mBGMPlayerNext!=null) {
-            mBGMPlayerNext.setVolume(mBGMVol, mBGMVol);
-        }
-    }
-
-    public void setBGMusicVolumeTemp(float vol, long timeoutmillis) {
-        setBGMusicVolume(vol);
-        final Timer t = new Timer();
-        t.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                setBGMusicVolume(mBGMVol);
-                t.cancel();
-            }
-        }, timeoutmillis);
     }
 
 
@@ -272,7 +116,7 @@ public class SoundEffects {
 
     public void setMute(boolean mute) {
         mMute = mute;
-        if (mMute) pauseBGMusic();
+
     }
 
     public boolean isMuted() {
@@ -344,8 +188,192 @@ public class SoundEffects {
 
 
     public void release() {
-        releaseBGM();
         mSounds.release();
+        for (BGMusic b: bgMusics) {
+            try {
+                b.releaseBGM();
+            } catch (Exception e) {
+                Log.e("BGM", e.getMessage(), e);
+            }
+        }
+    }
+
+
+    private static int[] getResIdArray(Context context, int id) {
+        final TypedArray idsarr = context.getResources().obtainTypedArray(id);
+        int [] ids = new int[idsarr.length()];
+        for (int i=0; i<idsarr.length(); i++) {
+            ids[i] = idsarr.getResourceId(i, 0);
+        }
+        idsarr.recycle();
+        return ids;
+    }
+
+    private List<BGMusic> bgMusics = new ArrayList<>();
+
+    public BGMusic getBGMusic() {
+        BGMusic b = new BGMusic(mContext);
+        bgMusics.add(b);
+        return b;
+    }
+
+    public static class BGMusic {
+
+        private int[] mBGMSongIds;
+        private MediaPlayer mBGMPlayer;
+        private MediaPlayer mBGMPlayerNext;
+
+        private float mBGMVol = 1;
+
+        private float mBGMVolume = .3f;
+
+        private Context mContext;
+
+        private BGMusic(Context context) {
+            mContext = context;
+            mBGMSongIds = getResIdArray(context, R.array.songs);
+        }
+
+        public int getBGMSongs() {
+            return mBGMSongIds.length;
+        }
+
+        public void playRandomBGMusic() {
+            playBGMusic(Utils.getRand(mBGMSongIds.length));
+
+        }
+        public void playBGMusic(final int which) {
+
+            Utils.async(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (mBGMPlayer!=null) {
+                        //pauseBGMusic();
+                        mBGMPlayer.release();
+                    }
+                    if (mBGMPlayerNext!=null) {
+                        mBGMPlayerNext.release();
+                    }
+
+                    mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
+                    mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
+
+                    mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
+                    mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
+
+                    mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
+                    mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
+
+                    mBGMPlayer.setOnCompletionListener(oncomplete);
+                    mBGMPlayerNext.setOnCompletionListener(oncomplete);
+
+                    mBGMPlayer.setOnErrorListener(onerr);
+                    mBGMPlayerNext.setOnErrorListener(onerr);
+
+
+                    mBGMPlayer.start();
+
+                }
+            });
+        }
+
+
+        Handler h = new Handler();
+
+        private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (!((App)mContext.getApplicationContext()).check(mContext)) {
+                    mediaPlayer.release();
+                    mBGMPlayer.release();
+                    mBGMPlayerNext.release();
+                    return;
+                }
+                h.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+                mediaPlayer.seekTo(0);
+            }
+        };
+
+        private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                mediaPlayer.release();
+                mBGMPlayer.release();
+                mBGMPlayerNext.release();
+                mBGMPlayer = null;
+                mBGMPlayerNext = null;
+                return false;
+            }
+        };
+
+
+        public void pauseBGMusic() {
+            if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
+                mBGMPlayer.pause();
+            }
+        }
+
+        public void restartBGMusic() {
+            pauseBGMusic();
+            if (mBGMPlayer!=null) {
+                mBGMPlayer.seekTo(0);
+                mBGMPlayer.start();
+
+            }
+        }
+
+        public void releaseBGM() {
+            if (mBGMPlayer!=null) {
+                try {
+                    mBGMPlayer.setNextMediaPlayer(null);
+                    mBGMPlayer.stop();
+                } catch( Exception e) { };
+                mBGMPlayer.release();
+                mBGMPlayer=null;
+            }
+            if (mBGMPlayerNext!=null) {
+                try {
+                    mBGMPlayerNext.setNextMediaPlayer(null);
+                    mBGMPlayerNext.stop();
+                } catch( Exception e) { };
+                mBGMPlayerNext.release();
+                mBGMPlayerNext=null;
+            }
+        }
+
+        public void deltaBGMusicVolume(float volchange) {
+            float newvol = mBGMVol+volchange;
+            if (newvol>=0 || newvol <=1) {
+                setBGMusicVolume(newvol);
+            }
+        }
+        public void setBGMusicVolume(float vol) {
+            mBGMVol = vol;
+            if (mBGMPlayer!=null) {
+                mBGMPlayer.setVolume(mBGMVol, mBGMVol);
+            }
+            if (mBGMPlayerNext!=null) {
+                mBGMPlayerNext.setVolume(mBGMVol, mBGMVol);
+            }
+        }
+
+        public void setBGMusicVolumeTemp(float vol, long timeoutmillis) {
+            setBGMusicVolume(vol);
+            final Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    setBGMusicVolume(mBGMVol);
+                    t.cancel();
+                }
+            }, timeoutmillis);
+        }
     }
 
 

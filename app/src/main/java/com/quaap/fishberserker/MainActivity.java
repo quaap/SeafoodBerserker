@@ -28,8 +28,10 @@ public class MainActivity extends Activity  {
     TimerTask task;
 
     private int mWavenum;
-    private App app;
+
     private SoundEffects mSounds;
+
+    private SoundEffects.BGMusic mBGMusic;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,13 +113,13 @@ public class MainActivity extends Activity  {
         task.cancel();
         timer.cancel();
 
-        mSounds.releaseBGM();
+        mBGMusic.releaseBGM();
         mMainFishView.pause();
 
         int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
-        mSounds.releaseBGM();
+        mBGMusic.releaseBGM();
         super.onPause();
     }
 
@@ -129,11 +131,14 @@ public class MainActivity extends Activity  {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
+        mSounds = App.getInstance(this).getSoundEffects();
+        mBGMusic = mSounds.getBGMusic();
+
         mMainFishView.unpause();
         task = new TimerTask() {
             @Override
             public void run() {
-                mSounds.playRandomBGMusic();
+                mBGMusic.playRandomBGMusic();
                 mWavenum++;
                 mMainFishView.setText("Wave " + mWavenum);
                 mMainFishView.postDelayed(new Runnable() {
@@ -146,16 +151,14 @@ public class MainActivity extends Activity  {
         };
         timer = new Timer();
         timer.schedule(task, 2000, 60000);
-        app = App.getInstance(this);
-        mSounds = app.getSoundEffects();
-        //app.getSoundEffects().playBGMusic(0);
+
         showScores();
 
     }
 
     @Override
     protected void onDestroy() {
-        mSounds.release();
+        mBGMusic.releaseBGM();
         super.onDestroy();
     }
 }
