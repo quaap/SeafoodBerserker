@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -89,7 +88,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private long mIntervalStarted;
     private int mMaxNumFly;
     private boolean mWaveGoing;
-    private double mSpin = 0;
+    private double mShipBob = 0;
     private Stack<float[]> mAxes = new Stack<>();
     private float x1;
     private float y1;
@@ -227,13 +226,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         return item;
     }
 
+
+
     private void doDraw(final Canvas canvas, long ticks) {
 
         spawnAsNeeded();
 
-        mSpin+=.08;
+        mShipBob +=.08;
+        double shipBobSin = Math.sin(mShipBob);
 
-        canvas.drawBitmap(bgsScaled[0],0,(int)(Math.sin(mSpin)*10), null);
+
+        Rect dst = new Rect(0, (int) (shipBobSin * 10), mWidth, mHeight);
+
+        canvas.drawBitmap(bgsScaled[0], null, dst, null);
+
+        // canvas.drawPaint(mBGPaint);
+
 
         int times = 0;
         int points = 0;
@@ -319,7 +327,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
 
-        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2,null);
+        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2 + (int)(shipBobSin*-4),null);
 
         //draw items coming down here so they'll fall over bottem foreground.
         for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
@@ -329,14 +337,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 item.draw(canvas);
             }
         }
-        canvas.drawBitmap(fgtopsScaled[0],0, -fgtopsScaled[0].getHeight()/2,null);
+        canvas.drawBitmap(fgtopsScaled[0],0 + (int)(shipBobSin*3), -fgtopsScaled[0].getHeight()/2 + (int)(shipBobSin*-5),null);
 
         if (mScore!=null) {
             canvas.drawText(mScore, 10, mTextPaint.getTextSize(), mTextPaint);
         }
 
         Bitmap lifeBm = availableItems.get(0).getBitmap();
-        for (int i=0; i<mLives; i++) {
+        for (int i=1; i<=mLives; i++) {
             canvas.drawBitmap(lifeBm, mWidth - (i*lifeBm.getWidth()+10), 10, mTextPaint);
         }
 
@@ -425,16 +433,16 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mWidth = width;
         mHeight = height;
 
-
+        int scale = 6;
         for (int b=0;b<bgs.length; b++) {
             int bgw = bgs[b].getWidth();
             int bgh = bgs[b].getHeight();
             int bgw2 = (int) (bgw / (double) bgh * mHeight);
 
             Rect src = new Rect(0, 0, bgw, bgh);
-            Rect dest = new Rect(0, 0, bgw2, mHeight);
+            Rect dest = new Rect(0, 0, bgw2/scale, mHeight/scale);
 
-            bgsScaled[b] = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            bgsScaled[b] = Bitmap.createBitmap(mWidth/scale, mHeight/scale, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bgsScaled[b]);
             c.drawBitmap(bgs[b], src, dest, null);
         }
