@@ -48,15 +48,16 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
-    private final double GRAVITY = 2;
+    private final double GRAVITY = 1.5;
     private final double AIRRESIST = .06;
 
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -20;
+    private final double INITIAL_YVMIN = GRAVITY * -24;
 
-    private final double INITIAL_YVMAX = GRAVITY * -30;
+    private final double INITIAL_YVMAX = GRAVITY * -33;
+
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
     private final Bitmap[] splats = new Bitmap[2];
@@ -136,7 +137,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             mLinePaint.setARGB(255, 255, 64, 64);
             mLinePaint.setStrokeWidth(5);
             mBGPaint = new Paint();
-            mBGPaint.setARGB(255, 255, 255, 255);
+            mBGPaint.setARGB(255, 127, 127, 200);
 
             mTextPaint = new Paint();
             mTextPaint.setColor(Color.BLACK);
@@ -212,7 +213,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         int xmid = (int)(mWidth/2*.8);
 
         if (xv<0) {
-            item.setX(mWidth - Utils.getRand(xmid) - 20);
+            item.setX(mWidth - Utils.getRand(xmid) - xmid/4);
         } else {
             item.setX(Utils.getRand(xmid) + 20);
         }
@@ -228,21 +229,129 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
 
-    private void doDraw(final Canvas canvas, long ticks) {
+    private void doDraw(final Canvas canvas) {
 
         spawnAsNeeded();
 
-        mShipBob +=.08;
+        mShipBob +=.06;
         double shipBobSin = Math.sin(mShipBob);
 
+        drawBackground(canvas, shipBobSin);
 
+
+        markHits(canvas);
+
+
+        moveAndDrawItems(canvas);
+
+        pareDeadItems();
+
+        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2 + (int)(shipBobSin*-4),null);
+
+        drawFallingItems(canvas);
+
+        canvas.drawBitmap(fgtopsScaled[0],(int)(shipBobSin*3), -fgtopsScaled[0].getHeight()/2 + (int)(shipBobSin*-5),null);
+
+        drawScoreboard(canvas);
+
+        drawLives(canvas);
+
+        drawPopupText(canvas);
+
+    }
+
+    private void drawBackground(Canvas canvas, double shipBobSin) {
         Rect dst = new Rect(0, (int) (shipBobSin * 10), mWidth, mHeight);
 
         canvas.drawBitmap(bgsScaled[0], null, dst, null);
 
         // canvas.drawPaint(mBGPaint);
+    }
 
+    private void drawPopupText(Canvas canvas) {
+        synchronized (mTextLock) {
+            if (mText!=null) {
+                float [] widths = new float[mText.length()];
+                mTextPaint.getTextWidths(mText, widths);
+                float sum = 0;
+                for (float w : widths) {
+                    sum += w;
+                }
 
+                canvas.drawText(mText, mWidth/2 - sum/2, mHeight/3 , mTextPaint);
+                if (System.currentTimeMillis() - mTextStarted > 1500) {
+                    mText = null;
+                }
+            }
+
+        }
+    }
+
+    private void drawLives(Canvas canvas) {
+        Bitmap lifeBm = availableItems.get(0).getBitmap();
+        for (int i=1; i<=mLives; i++) {
+            canvas.drawBitmap(lifeBm, mWidth - (i*lifeBm.getWidth()+10), 10, mTextPaint);
+        }
+    }
+
+    private void drawScoreboard(Canvas canvas) {
+        if (mScore!=null) {
+            canvas.drawText(mScore, 10, mTextPaint.getTextSize(), mTextPaint);
+        }
+    }
+
+    private void drawFallingItems(Canvas canvas) {
+        synchronized (itemsInPlay) {
+            //draw items coming down here so they'll fall over bottem foreground.
+            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+                FlyingItem item = it.next();
+
+                if (item.getYv() > 0 && !item.wasHit() && !item.isBoom()) {
+                    item.draw(canvas);
+                }
+            }
+        }
+    }
+
+    private void pareDeadItems() {
+        //remove some hit items early if too many;
+        if (itemsInPlay.size()>12) {
+            int num = 0;
+            synchronized (itemsInPlay) {
+                for (Iterator<FlyingItem> it = itemsInPlay.listIterator(2); it.hasNext(); ) {
+                    FlyingItem item = it.next();
+                    if (item.wasHit()) {
+                        it.remove();
+                        if (num++ > 4) {
+                            break;
+                        }
+
+                    }
+                }
+            }
+            Log.d("f", "removed " + num + " items early");
+        }
+    }
+
+    private void moveAndDrawItems(Canvas canvas) {
+        synchronized (itemsInPlay) {
+            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
+                FlyingItem item = it.next();
+                item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
+                if (item.getY() > mHeight && item.getYv() > 0 || item.getX() < 0 || item.getX() > mWidth) {
+                    if (!item.isBoom() && !item.wasHit() && onPointsListener != null) {
+                        onPointsListener.onMiss(item.getValue());
+                    }
+                    it.remove();
+                } else if (item.getYv() <= 0 || item.wasHit() || item.isBoom()) {
+
+                    item.draw(canvas);
+                }
+            }
+        }
+    }
+
+    private void markHits(Canvas canvas) {
         int times = 0;
         int points = 0;
         int hits = 0;
@@ -271,7 +380,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setYv(3);
                                     item.setXv(item.getXv()/2);
                                     item.setSpinv(1);
-                                    canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
+                                    //canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
                                     points += item.getValue();
                                     hits++;
                                 }
@@ -292,81 +401,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         if ((points>0 || hits>0) && onPointsListener!=null) {
             onPointsListener.onPoints(points,hits);
         }
-
-        synchronized (itemsInPlay) {
-
-            for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
-                FlyingItem item = it.next();
-                item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
-                if (item.getY() > mHeight && item.getYv() > 0 || item.getX()<0 || item.getX()>mWidth) {
-                    if (!item.isBoom() && !item.wasHit() && onPointsListener!=null) {
-                        onPointsListener.onMiss(item.getValue());
-                    }
-                    it.remove();
-                } else if (item.getYv()<=0 || item.wasHit() || item.isBoom()){
-
-                    item.draw(canvas);
-                }
-            }
-
-            //remove some hit items early if too many;
-            if (itemsInPlay.size()>12) {
-                int num = 0;
-                for (Iterator<FlyingItem> it = itemsInPlay.listIterator(2); it.hasNext(); ) {
-                    FlyingItem item = it.next();
-                    if (item.wasHit()) {
-                        it.remove();
-                        if (num++>4) {
-                            break;
-                        }
-
-                    }
-                }
-                Log.d("f", "removed " + num + " items early");
-            }
-        }
-
-
-        canvas.drawBitmap(fgbottomsScaled[0],0, mHeight - fgbottomsScaled[0].getHeight()/2 + (int)(shipBobSin*-4),null);
-
-        //draw items coming down here so they'll fall over bottem foreground.
-        for (Iterator<FlyingItem> it = itemsInPlay.iterator(); it.hasNext(); ) {
-            FlyingItem item = it.next();
-
-            if (item.getYv()>0 && !item.wasHit() && !item.isBoom()){
-                item.draw(canvas);
-            }
-        }
-        canvas.drawBitmap(fgtopsScaled[0],0 + (int)(shipBobSin*3), -fgtopsScaled[0].getHeight()/2 + (int)(shipBobSin*-5),null);
-
-        if (mScore!=null) {
-            canvas.drawText(mScore, 10, mTextPaint.getTextSize(), mTextPaint);
-        }
-
-        Bitmap lifeBm = availableItems.get(0).getBitmap();
-        for (int i=1; i<=mLives; i++) {
-            canvas.drawBitmap(lifeBm, mWidth - (i*lifeBm.getWidth()+10), 10, mTextPaint);
-        }
-
-
-        synchronized (mTextLock) {
-            if (mText!=null) {
-                float [] widths = new float[mText.length()];
-                mTextPaint.getTextWidths(mText, widths);
-                float sum = 0;
-                for (float w : widths) {
-                    sum += w;
-                }
-
-                canvas.drawText(mText, mWidth/2 - sum/2, mHeight/3 , mTextPaint);
-                if (System.currentTimeMillis() - mTextStarted > 1500) {
-                    mText = null;
-                }
-            }
-
-        }
-
-
     }
 
     @Override
@@ -533,23 +567,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         public void run() {
             Log.d("RunThread", "run");
             mRun = true;
-            long lasttime = System.currentTimeMillis();
-            while (mRun) {
-                if (mPaused) {
-                    try {
-                        sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    final long now = System.currentTimeMillis();
+            try {
+                while (mRun) {
+                    if (mPaused) {
+                        try {
+                            sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        final long start = System.currentTimeMillis();
 
-                    if (now - lasttime > STEP) {
                         Canvas c = null;
                         try {
                             c = mSurfaceHolder.lockCanvas();
                             if (mRun && !mPaused) {
-                                doDraw(c, System.currentTimeMillis() - lasttime);
+                                doDraw(c);
                             }
 
                         } finally {
@@ -557,16 +590,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                 mSurfaceHolder.unlockCanvasAndPost(c);
                             }
                         }
-                        lasttime = System.currentTimeMillis();
-                    }
-                    else {
-//                        try {
-//                            sleep(STEP/5);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
+                        long runtime = System.currentTimeMillis() - start;
+
+                        if (runtime < STEP) {
+                            Thread.sleep(STEP - runtime);
+                        }
                     }
                 }
+            } catch (InterruptedException e) {
+                Log.e("FishLoop", "Mainloop interrupted");
             }
         }
 
