@@ -493,16 +493,16 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mWidth = width;
         mHeight = height;
 
-        int scale = 6;
+
         for (int b=0;b<bgs.length; b++) {
             int bgw = bgs[b].getWidth();
             int bgh = bgs[b].getHeight();
             int bgw2 = (int) (bgw / (double) bgh * mHeight);
 
-            Rect src = new Rect(0, 0, bgw, bgh);
-            Rect dest = new Rect(0, 0, bgw2/scale, mHeight/scale);
+            Rect src = new Rect(bgw>mWidth ? Utils.getRand(bgw - mWidth-1):0, 0, bgw, bgh);
+            Rect dest = new Rect(0, 0, bgw2, mHeight);
 
-            bgsScaled[b] = Bitmap.createBitmap(mWidth/scale, mHeight/scale, Bitmap.Config.ARGB_8888);
+            bgsScaled[b] = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bgsScaled[b]);
             c.drawBitmap(bgs[b], src, dest, null);
         }
