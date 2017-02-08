@@ -149,6 +149,7 @@ public class MainActivity extends Activity  {
         app = App.getInstance(this);
         mSounds = app.getSoundEffects();
         //app.getSoundEffects().playBGMusic(0);
+        showScores();
 
     }
 

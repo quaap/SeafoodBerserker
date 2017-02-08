@@ -62,6 +62,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
     private final Bitmap[] splats = new Bitmap[2];
     private final Bitmap[] anchor = new Bitmap[1];
+    private final Bitmap[] axes = new Bitmap[1];
     private final Bitmap[] bgs = new Bitmap[1];
     private final Bitmap[] fgtops = new Bitmap[1];
     private final Bitmap[] fgbottoms = new Bitmap[1];
@@ -116,7 +117,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
             splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
-            anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor);
+            anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor_sm);
+            axes[0] = BitmapFactory.decodeResource(getResources(), R.drawable.axe);
             bgs[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sea);
             fgtops[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sail);
             fgbottoms[0] = BitmapFactory.decodeResource(getResources(), R.drawable.shipside2);
@@ -178,6 +180,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mWaveGoing = true;
     }
 
+    private long lastAnchor = System.currentTimeMillis();
     private void spawnAsNeeded() {
         if (mWaveGoing) {
             long now = System.currentTimeMillis();
@@ -190,12 +193,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     return;
                 }
 
-
                 if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis) && Utils.getRand(100)>82) {
                     FlyingItem item = spawnFish();
-                    if (Utils.getRand(0,100)>95) {
+                    if (Utils.getRand(0,100)>97 || now - lastAnchor>5000 && wavespan>mIntervalmillis/3) {
                         item.setBitmap(anchor[0]);
                         item.setBoom(true);
+                        item.setYv(Utils.getRand(0,100)<90 ? INITIAL_YVMIN + 2 : INITIAL_YVMAX-2);
+                        lastAnchor = now;
                     }
                 }
             } else {
@@ -288,9 +292,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     private void drawLives(Canvas canvas) {
-        Bitmap lifeBm = availableItems.get(0).getBitmap();
+
         for (int i=1; i<=mLives; i++) {
-            canvas.drawBitmap(lifeBm, mWidth - (i*lifeBm.getWidth()+10), 10, mTextPaint);
+            canvas.drawBitmap(axes[0], mWidth - (i*axes[0].getWidth()+10), 10, null);
         }
     }
 
