@@ -191,10 +191,18 @@ public class SoundEffects {
 
     public void releaseBGM() {
         if (mBGMPlayer!=null) {
+            try {
+                mBGMPlayer.setNextMediaPlayer(null);
+                mBGMPlayer.stop();
+            } catch( Exception e) { };
             mBGMPlayer.release();
             mBGMPlayer=null;
         }
         if (mBGMPlayerNext!=null) {
+            try {
+                mBGMPlayerNext.setNextMediaPlayer(null);
+                mBGMPlayerNext.stop();
+            } catch( Exception e) { };
             mBGMPlayerNext.release();
             mBGMPlayerNext=null;
         }

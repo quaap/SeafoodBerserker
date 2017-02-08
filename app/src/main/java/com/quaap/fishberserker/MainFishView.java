@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -74,6 +75,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final Bitmap[] anchor = new Bitmap[1];
 
+    private final Bitmap[] bgs = new Bitmap[1];
+    private final Bitmap[] fgtops = new Bitmap[1];
+    private final Bitmap[] fgbottoms = new Bitmap[1];
+
+    private final Bitmap[] bgsScaled = new Bitmap[1];
+    private final Bitmap[] fgtopsScaled = new Bitmap[1];
+    private final Bitmap[] fgbottomsScaled = new Bitmap[1];
+
 
     private OnPointsListener onPointsListener;
 
@@ -99,6 +108,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
             splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
             anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor);
+            bgs[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sea);
+            fgtops[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sail);
+            fgbottoms[0] = BitmapFactory.decodeResource(getResources(), R.drawable.shipside2);
 
             final SurfaceHolder holder = getHolder();
             holder.addCallback(this);
@@ -199,7 +211,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 //            spawnFish();
 //        }
 
-        canvas.drawPaint(mBGPaint);
+        //canvas.drawPaint(mBGPaint);
+//        int bgw = bgs[0].getWidth();
+//        int bgh = bgs[0].getHeight();
+//        int bgw2 = bgw/bgh*mHeight;
+//
+//        Rect src = new Rect(0,0,bgw,bgh);
+//        Rect dest = new Rect(0,0, bgw2, mHeight);
+        canvas.drawBitmap(bgsScaled[0],0,0, null);
 
         int times = 0;
         int points = 0;
@@ -285,6 +304,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
 
+        canvas.drawBitmap(fgtops[0],0, -fgtops[0].getHeight()/2,null);
+        canvas.drawBitmap(fgbottoms[0],0, mHeight - fgbottoms[0].getHeight()/2,null);
 
         synchronized (mTextLock) {
             if (mText!=null) {
@@ -397,6 +418,20 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public void surfaceChanged(SurfaceHolder surfaceHolder, final int format, final int width, final int height) {
         mWidth = width;
         mHeight = height;
+
+
+        for (int b=0;b<bgs.length; b++) {
+            int bgw = bgs[b].getWidth();
+            int bgh = bgs[b].getHeight();
+            int bgw2 = (int) (bgw / (double) bgh * mHeight);
+
+            Rect src = new Rect(0, 0, bgw, bgh);
+            Rect dest = new Rect(0, 0, bgw2, mHeight);
+
+            bgsScaled[b] = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(bgsScaled[0]);
+            c.drawBitmap(bgs[b], src, dest, null);
+        }
 
         Log.d("dimen", mWidth + "x" + mHeight);
         if (mThread!=null) {

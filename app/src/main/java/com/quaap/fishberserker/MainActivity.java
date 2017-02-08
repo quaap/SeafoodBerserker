@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -23,7 +24,7 @@ public class MainActivity extends Activity  {
 
     final Handler handler = new Handler();
 
-    final Timer timer = new Timer();
+    Timer timer;
     TimerTask task;
 
     private int mWavenum;
@@ -106,34 +107,49 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onPause() {
-        app.getSoundEffects().releaseBGM();
         task.cancel();
+        timer.cancel();
+
+        mSounds.releaseBGM();
         mMainFishView.pause();
+
+        int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+
+        mSounds.releaseBGM();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+
         mMainFishView.unpause();
         task = new TimerTask() {
             @Override
             public void run() {
+                mSounds.playRandomBGMusic();
                 mWavenum++;
                 mMainFishView.setText("Wave " + mWavenum);
                 mMainFishView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         mMainFishView.startWave(mWavenum, 5000, 11);
-                        mSounds.playRandomBGMusic();
                     }
                 }, 3500);
             }
         };
-
+        timer = new Timer();
         timer.schedule(task, 2000, 60000);
         app = App.getInstance(this);
         mSounds = app.getSoundEffects();
         //app.getSoundEffects().playBGMusic(0);
+
     }
+
+
 }
