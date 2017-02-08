@@ -102,6 +102,7 @@ public class MainActivity extends Activity  {
     private void showScores() {
         mPointsView.setText(mPoints + "");
         mLivesView.setText(mLives + " Lives");
+        mMainFishView.setTopStatus(mPoints + "", mLives);
     }
 
 

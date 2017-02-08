@@ -18,7 +18,6 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -59,34 +58,42 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final double INITIAL_YVMIN = GRAVITY * -20;
 
     private final double INITIAL_YVMAX = GRAVITY * -30;
-
-    private Paint mLinePaint;
-    private Paint mBGPaint;
-    private Paint mTextPaint;
-
-    private RunThread mThread;
-
-    private int mWidth;
-    private int mHeight;
-
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
-
     private final Bitmap[] splats = new Bitmap[2];
-
     private final Bitmap[] anchor = new Bitmap[1];
-
     private final Bitmap[] bgs = new Bitmap[1];
     private final Bitmap[] fgtops = new Bitmap[1];
     private final Bitmap[] fgbottoms = new Bitmap[1];
-
     private final Bitmap[] bgsScaled = new Bitmap[1];
     private final Bitmap[] fgtopsScaled = new Bitmap[1];
     private final Bitmap[] fgbottomsScaled = new Bitmap[1];
 
-    Matrix mSpinMatrix = new Matrix();
+    private Paint mLinePaint;
+    private Paint mBGPaint;
+    private Paint mTextPaint;
+    private String mScore;
+    private int mLives;
+    private volatile String mText;
+    private final Object mTextLock = new Object();
 
+    private RunThread mThread;
+    private int mWidth;
+    private int mHeight;
     private OnPointsListener onPointsListener;
+    private long mTextStarted;
+    private long mWaveStarted;
+    private int mWaveNum;
+    private int mIntervalmillis;
+    private int mIntervals;
+    private long mIntervalStarted;
+    private int mMaxNumFly;
+    private boolean mWaveGoing;
+    private double mSpin = 0;
+    private Stack<float[]> mAxes = new Stack<>();
+    private float x1;
+    private float y1;
+    private long starttime;
 
 
     public MainFishView(Context context) {
@@ -144,31 +151,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         this.onPointsListener = onPointsListener;
     }
 
-    private final Object mTextLock = new Object();
-    private volatile String mText;
-    private long mTextStarted;
-
     public void setText(String text) {
-
         synchronized (mTextLock) {
             mText = text;
             mTextStarted = System.currentTimeMillis();
         }
-
     }
+
+    public void setTopStatus(String score, int lives) {
+        mScore = score;
+        mLives = lives;
+    }
+
 
     public void setBonusMode(boolean on) {
 
     }
-
-    private long mWaveStarted;
-    private int mWaveNum;
-    private int mIntervalmillis;
-    private int mIntervals;
-    private long mIntervalStarted;
-    private int mMaxNumFly;
-
-    private boolean mWaveGoing;
 
     public void startWave(int num, int intervalmillis, int intervals) {
         mWaveNum = num;
@@ -206,7 +204,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
-
     private FlyingItem spawnFish() {
         FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
@@ -230,8 +227,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         return item;
     }
 
-
-    private double mSpin = 0;
     private void doDraw(final Canvas canvas, long ticks) {
 
         spawnAsNeeded();
@@ -336,6 +331,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
         canvas.drawBitmap(fgtopsScaled[0],0, -fgtopsScaled[0].getHeight()/2,null);
 
+        if (mScore!=null) {
+            canvas.drawText(mScore, 10, mTextPaint.getTextSize(), mTextPaint);
+        }
+
+        Bitmap lifeBm = availableItems.get(0).getBitmap();
+        for (int i=0; i<mLives; i++) {
+            canvas.drawBitmap(lifeBm, mWidth - (i*lifeBm.getWidth()+10), 10, mTextPaint);
+        }
 
 
         synchronized (mTextLock) {
@@ -357,12 +360,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
     }
-
-    private volatile Stack<float[]> mAxes = new Stack<>();
-
-    private float x1;
-    private float y1;
-    private long starttime;
 
     @Override
     public boolean onTouch(View view, MotionEvent e) {
@@ -503,6 +500,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
 
+    public interface OnPointsListener {
+        void onPoints(int points, int hits);
+        void onMiss(int points);
+        void onBoom();
+    }
+
     class RunThread extends Thread {
 
 
@@ -576,12 +579,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         public boolean isRunning() {
             return mRun;
         }
-    }
-
-    public interface OnPointsListener {
-        void onPoints(int points, int hits);
-        void onMiss(int points);
-        void onBoom();
     }
 
 
