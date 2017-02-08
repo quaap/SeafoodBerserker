@@ -34,12 +34,7 @@ public class EntryActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        findViewById(R.id.start_game).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                s.playBGMusic(0);
-            }
-        },1000);
+        s.playBGMusic(0);
     }
 
     @Override

@@ -112,6 +112,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         init(context);
     }
 
+    int totalValue;
     private void init(Context context) {
         if (!this.isInEditMode()) {
 
@@ -127,10 +128,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             holder.addCallback(this);
             TypedArray fish = getResources().obtainTypedArray(R.array.fish);
             int[] values = getResources().getIntArray(R.array.points);
+            totalValue = 0;
             for (int i = 0; i < fish.length(); i++) {
                 FlyingItem item = new FlyingItem(BitmapFactory.decodeResource(getResources(), fish.getResourceId(i, 0)));
                 item.setValue(values[i]);
                 availableItems.add(item);
+                totalValue += (100 - values[i]);
             }
             fish.recycle();
 
@@ -209,7 +212,21 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     private FlyingItem spawnFish() {
-        FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
+
+        int randomIndex = -1;
+        double random = Math.random() * totalValue;
+        for (int i = 0; i < availableItems.size(); ++i)
+        {
+            random -= (100 - availableItems.get(i).getValue());
+            if (random <= 0.0d)
+            {
+                randomIndex = i;
+                break;
+            }
+        }
+
+        FlyingItem item = FlyingItem.getCopy(availableItems.get(randomIndex));
+        //FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
         double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
         item.setXv(xv);
