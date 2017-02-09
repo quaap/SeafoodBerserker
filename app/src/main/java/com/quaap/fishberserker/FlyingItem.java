@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.Bundle;
 
 /**
  * Created by tom on 2/3/17.
@@ -22,16 +23,8 @@ import android.graphics.Paint;
  * GNU General Public License for more details.
  */
 public class FlyingItem {
-    private Bitmap mBitmap;
-    private double mX;
-    private double mY;
-    private double mXv;
-    private double mYv;
-
-    private Paint mPaint;
-
-
     private static Paint scorePaint;
+
     static {
         scorePaint = new Paint();
         scorePaint.setColor(Color.BLACK);
@@ -39,31 +32,24 @@ public class FlyingItem {
         scorePaint.setTextSize(60);
     }
 
+    Matrix mSpinMatrix = new Matrix();
+    private Bitmap mBitmap;
+    private double mX;
+    private double mY;
+    private double mXv;
+    private double mYv;
+    private Paint mPaint;
     private double mScale;
     private double mSpin;
     private double mSpinv;
-    Matrix mSpinMatrix = new Matrix();
-
     private boolean fade;
-
     private boolean mHit;
-
     private int mValue;
     private String mText;
-
     private boolean mBoom;
 
     public FlyingItem(Bitmap bitmap) {
-        this(bitmap, 0, 0, 0, 0, 0);
-    }
-
-    public FlyingItem(Bitmap bitmap, double x, double xv, double y, double yv, double spinv) {
-        mBitmap = bitmap;
-        mX = x;
-        mXv = xv;
-        mY = y;
-        mYv = yv;
-        mSpinv = spinv;
+         mBitmap = bitmap;
 
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
@@ -79,7 +65,10 @@ public class FlyingItem {
         item2.mY = item.mY;
         item2.mYv = item.mYv;
         item2.mSpinv = item.mSpinv;
-
+        item2.mSpin = item.mSpin;
+        item2.mBoom = item.mBoom;
+        item2.mText = item.mText;
+        item2.fade = item.fade;
 
         item2.mPaint = new Paint(item.mPaint);
         item2.mScale = item.mScale;
@@ -87,6 +76,55 @@ public class FlyingItem {
         item2.mValue = item.mValue;
 
         return item2;
+    }
+
+    public static FlyingItem create(Bundle bundle) {
+
+        Bitmap bitmap = bundle.getParcelable("mBitmap");
+        FlyingItem item2 = new FlyingItem(bitmap);
+
+        item2.mX = bundle.getDouble("mX");
+        item2.mXv = bundle.getDouble("mXv");
+        item2.mY = bundle.getDouble("mY");
+        item2.mYv = bundle.getDouble("mYv");
+        item2.mSpinv = bundle.getDouble("mSpinv");
+        item2.mSpin = bundle.getDouble("mSpin");
+        item2.mBoom = bundle.getBoolean("mBoom");
+        item2.mText = bundle.getString("mText");
+        item2.fade = bundle.getBoolean("fade");
+
+        item2.mPaint = new Paint();
+        item2.mPaint.setColor(bundle.getInt("mPaintColor"));
+        item2.mPaint.setAlpha(bundle.getInt("mPaintAlpha"));
+        item2.mScale = bundle.getDouble("mScale");
+        item2.mHit = bundle.getBoolean("mHit");
+        item2.mValue = bundle.getInt("mValue");
+        return item2;
+
+    }
+
+    public void freeze(Bundle bundle) {
+
+        bundle.putParcelable("mBitmap", mBitmap);
+        
+        bundle.putDouble("mX", mX);
+        bundle.putDouble("mXv", mXv);
+        bundle.putDouble("mY", mY);
+        bundle.putDouble("mYv", mYv);
+        bundle.putDouble("mSpinv", mSpinv);
+        
+        bundle.putDouble("mSpin", mSpin);
+        bundle.putBoolean("mBoom", mBoom);
+        bundle.putString("mText", mText);
+        bundle.putBoolean("fade", fade);
+
+
+        bundle.putInt("mPaintColor", mPaint.getColor());
+        bundle.putInt("mPaintAlpha", mPaint.getAlpha());
+        bundle.putDouble("mScale", mScale);
+        bundle.putBoolean("mHit", mHit);
+        bundle.putDouble("mValue", mValue);
+
     }
 
     public void updatePosition(double gravity, double airresit) {

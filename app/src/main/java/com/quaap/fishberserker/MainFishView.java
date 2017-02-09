@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -69,15 +70,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final Bitmap[] bgsScaled = new Bitmap[1];
     private final Bitmap[] fgtopsScaled = new Bitmap[1];
     private final Bitmap[] fgbottomsScaled = new Bitmap[1];
-
+    private final Object mTextLock = new Object();
+    int totalValue;
     private Paint mLinePaint;
     private Paint mBGPaint;
     private Paint mTextPaint;
     private String mScore;
     private int mLives;
     private volatile String mText;
-    private final Object mTextLock = new Object();
-
     private RunThread mThread;
     private int mWidth;
     private int mHeight;
@@ -96,7 +96,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private float y1;
     private long starttime;
     private volatile int touchHits;
-
+    private long lastAnchor = System.currentTimeMillis();
 
     public MainFishView(Context context) {
         super(context);
@@ -107,13 +107,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         super(context, attrs);
         init(context);
     }
-
     public MainFishView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-    int totalValue;
     private void init(Context context) {
         if (!this.isInEditMode()) {
 
@@ -154,6 +152,60 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
+    public void freeze(Bundle bundle) {
+        bundle.putString("mText", mText);
+
+        bundle.putLong("freeztime", System.currentTimeMillis());
+
+       // bundle.putInt("mWaveNum", mWaveNum);
+        bundle.putInt("mIntervalmillis", mIntervalmillis);
+        bundle.putInt("mIntervals", mIntervals);
+        bundle.putLong("mWaveStarted", mWaveStarted);
+        bundle.putLong("mIntervalStarted", mIntervalStarted);
+        bundle.putInt("mMaxNumFly", mMaxNumFly);
+        bundle.putBoolean("mWaveGoing", mWaveGoing);
+//        bundle.putString("mScore", mScore);
+//        bundle.putInt("mLives", mLives);
+
+
+        bundle.putInt("numItemsInPlay", itemsInPlay.size());
+        for (int i=0; i<itemsInPlay.size(); i++) {
+            FlyingItem fi = itemsInPlay.get(i);
+            Bundle b = new Bundle();
+            fi.freeze(b);
+            bundle.putBundle("item" + i, b);
+        }
+    }
+
+    private boolean wasResumed;
+
+    public void unfreeze(Bundle bundle) {
+        mText = bundle.getString("mText");
+
+        mWaveNum = bundle.getInt("mWaveNum");
+        mIntervalmillis = bundle.getInt("mIntervalmillis");
+        mIntervals = bundle.getInt("mIntervals");
+        mWaveStarted = bundle.getLong("mWaveStarted");
+        mIntervalStarted = bundle.getLong("mIntervalStarted");
+        mMaxNumFly = bundle.getInt("mMaxNumFly");
+        mWaveGoing = bundle.getBoolean("mWaveGoing");
+//        mScore = bundle.getString("mScore");
+//        mLives = bundle.getInt("mLives");
+
+        int numitems = bundle.getInt("numItemsInPlay");
+        for (int i=0; i<numitems; i++) {
+            FlyingItem fi = FlyingItem.create(bundle.getBundle("item"+i));
+            itemsInPlay.add(fi);
+        }
+
+        long freeztime = bundle.getLong("freeztime");
+        long diff =  System.currentTimeMillis() - freeztime;
+        mWaveStarted += diff;
+        mIntervalStarted += diff;
+        wasResumed = true;
+
+    }
+
     public void setOnPointsListener(OnPointsListener onPointsListener) {
         this.onPointsListener = onPointsListener;
     }
@@ -170,22 +222,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mLives = lives;
     }
 
-
     public void setBonusMode(boolean on) {
 
     }
 
     public void startWave(int num, int intervalmillis, int intervals) {
-        mWaveNum = num;
-        mIntervalmillis = intervalmillis;
-        mIntervals = intervals;
-        mWaveStarted = System.currentTimeMillis();
-        mIntervalStarted = mWaveStarted;
-        mMaxNumFly = num + 2;
-        mWaveGoing = true;
+
+            mWaveNum = num;
+            mIntervalmillis = intervalmillis;
+            mIntervals = intervals;
+            mWaveStarted = System.currentTimeMillis();
+            mIntervalStarted = mWaveStarted;
+            mMaxNumFly = num + 2;
+            mWaveGoing = true;
+
     }
 
-    private long lastAnchor = System.currentTimeMillis();
     private void spawnAsNeeded() {
         if (mWaveGoing) {
             long now = System.currentTimeMillis();
