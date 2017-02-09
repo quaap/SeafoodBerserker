@@ -60,7 +60,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
-    private final Bitmap[] splats = new Bitmap[2];
+    private final Bitmap[] splats = new Bitmap[3];
     private final Bitmap[] anchor = new Bitmap[1];
     private final Bitmap[] axes = new Bitmap[1];
     private final Bitmap[] bgs = new Bitmap[1];
@@ -118,6 +118,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             splats[0] = BitmapFactory.decodeResource(getResources(), R.drawable.splat1);
             splats[1] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
+            splats[2] = BitmapFactory.decodeResource(getResources(), R.drawable.splat2);
             anchor[0] = BitmapFactory.decodeResource(getResources(), R.drawable.anchor_sm);
             axes[0] = BitmapFactory.decodeResource(getResources(), R.drawable.axe2);
             bgs[0] = BitmapFactory.decodeResource(getResources(), R.drawable.sea);
