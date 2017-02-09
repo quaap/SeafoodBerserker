@@ -19,6 +19,7 @@ public class MainActivity extends Activity  {
     private int mLives;
 
     final Handler handler = new Handler();
+    private final int NEW_LIFE_EVERY = 5000;
 
     Timer timer;
     TimerTask task;
@@ -46,7 +47,12 @@ public class MainActivity extends Activity  {
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
             public void onPoints(int points) {
-                mSounds.playGood();
+                if (mPoints%NEW_LIFE_EVERY > (mPoints+points)%NEW_LIFE_EVERY) {
+                    mLives++;
+                    mSounds.playBest();
+                } else {
+                    mSounds.playGood();
+                }
 
                 mPoints += points;
                 updateScores();
@@ -57,9 +63,9 @@ public class MainActivity extends Activity  {
             public void onCombo(int hits) {
                 mSounds.playGood();
                 if (hits>2) {
-                    mPoints += hits*10;
+                    onPoints(hits*10);
                     mMainFishView.setText("Combo Bonus!");
-                    updateScores();
+
                 }
             }
 
@@ -72,6 +78,7 @@ public class MainActivity extends Activity  {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
+                            mMainFishView.setText("Game Over");
                             mMainFishView.end();
 
                         }

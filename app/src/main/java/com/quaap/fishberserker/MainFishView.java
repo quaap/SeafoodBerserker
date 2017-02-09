@@ -335,7 +335,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private void drawLives(Canvas canvas) {
 
         for (int i=1; i<=mLives; i++) {
-            canvas.drawBitmap(axes[0], mWidth - (i*axes[0].getWidth()+10), 10, null);
+            canvas.drawBitmap(axes[0], mWidth - (i*axes[0].getWidth()+2), 10, null);
         }
     }
 

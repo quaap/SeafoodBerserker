@@ -144,42 +144,30 @@ public class SoundEffects {
     }
 
     public void playGood() {
-        List<Integer> goods = new ArrayList<>();
-        for (int i=0; i<soundUses.length; i++) {
-            if (soundUses[i].equals("good")) {
-                goods.add(i);
-            }
-        }
-
-        play(goods.get(Utils.getRand(goods.size())));
+        playUsage("good");
     }
 
     public void playBad() {
-        List<Integer> bads = new ArrayList<>();
-        for (int i=0; i<soundUses.length; i++) {
-            if (soundUses[i].equals("bad")) {
-                bads.add(i);
-            }
-        }
+        playUsage("bad");
+    }
 
-        play(bads.get(Utils.getRand(bads.size())));
+    public void playBest() {
+        playUsage("best");
     }
 
 
-    public void playLoop() {
-        List<Integer> loops = new ArrayList<>();
+    public void playUsage(String usage) {
+        List<Integer> usages = new ArrayList<>();
         for (int i=0; i<soundUses.length; i++) {
-            if (soundUses[i].equals("loop")) {
-                loops.add(i);
+            if (soundUses[i].equals(usage)) {
+                usages.add(i);
             }
         }
 
-        loop(loops.get(Utils.getRand(loops.size())), Utils.getRandInt(1,4));
+        play(usages.get(Utils.getRand(usages.size())));
     }
 
-//    public boolean isLooping() {
-//       // mSounds.
-//    }
+
 
     private float getRandHundreth() {
         return (float)((Math.random()-.5)/10);
@@ -223,9 +211,7 @@ public class SoundEffects {
         private MediaPlayer mBGMPlayer;
         private MediaPlayer mBGMPlayerNext;
 
-        private float mBGMVol = 1;
-
-        private float mBGMVolume = .3f;
+        private float mBGMVolume = .2f;
 
         private Context mContext;
 
@@ -348,18 +334,18 @@ public class SoundEffects {
         }
 
         public void deltaBGMusicVolume(float volchange) {
-            float newvol = mBGMVol+volchange;
+            float newvol = mBGMVolume+volchange;
             if (newvol>=0 || newvol <=1) {
                 setBGMusicVolume(newvol);
             }
         }
         public void setBGMusicVolume(float vol) {
-            mBGMVol = vol;
+            mBGMVolume = vol;
             if (mBGMPlayer!=null) {
-                mBGMPlayer.setVolume(mBGMVol, mBGMVol);
+                mBGMPlayer.setVolume(mBGMVolume, mBGMVolume);
             }
             if (mBGMPlayerNext!=null) {
-                mBGMPlayerNext.setVolume(mBGMVol, mBGMVol);
+                mBGMPlayerNext.setVolume(mBGMVolume, mBGMVolume);
             }
         }
 
@@ -369,7 +355,7 @@ public class SoundEffects {
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    setBGMusicVolume(mBGMVol);
+                    setBGMusicVolume(mBGMVolume);
                     t.cancel();
                 }
             }, timeoutmillis);

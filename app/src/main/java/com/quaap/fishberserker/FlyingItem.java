@@ -39,7 +39,7 @@ public class FlyingItem {
         scorePaint.setTextSize(60);
     }
 
-    private float mScale;
+    private double mScale;
     private double mSpin;
     private double mSpinv;
     Matrix mSpinMatrix = new Matrix();
@@ -67,7 +67,7 @@ public class FlyingItem {
 
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
-        mScale = (float)Utils.getRand(.7,1);
+        mScale = (float)Utils.getRand(.1,.4);
     }
 
 
@@ -101,6 +101,10 @@ public class FlyingItem {
         mX += mXv;
         mY += mYv;
         mSpin += mSpinv;
+
+        if (!wasHit()) {
+            mScale += (1 - mScale) / 33;
+        }
     }
 
     public boolean isHit(float x, float y) {
@@ -110,8 +114,8 @@ public class FlyingItem {
         int height2 = mBitmap.getHeight()/2;
 
         if (isBoom()) {
-            width2 *=.8;
-            height2 *=.8;
+            width2 *=.7;
+            height2 *=.7;
         }
 
         return (x > mX-width2 && x < mX+width2 && y > mY-height2 && y < mY+height2);
@@ -161,11 +165,12 @@ public class FlyingItem {
         if (mBitmap!=null) {
             max = Math.max(mBitmap.getHeight(), mBitmap.getWidth());
 
+
             mSpinMatrix.reset();
             //mSpinMatrix.setTranslate(0, bmHeight/2);
             mSpinMatrix.setRotate((float) mSpin, max / 2, max / 2);
             // mSpinMatrix.setTranslate(max/2, max/2);
-            mSpinMatrix.postScale(mScale, mScale);
+            mSpinMatrix.postScale((float)mScale, (float)mScale);
 
 
             Bitmap bm = Bitmap.createBitmap(max, max, Bitmap.Config.ARGB_8888);
