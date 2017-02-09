@@ -95,6 +95,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private float x1;
     private float y1;
     private long starttime;
+    private volatile int touchHits;
 
 
     public MainFishView(Context context) {
@@ -398,7 +399,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private void markHits(Canvas canvas) {
         int times = 0;
         int points = 0;
-        int hits = 0;
+
         while (mAxes.size()>0 && times++< MAX_AXES_REPS) {
             float[] axe = mAxes.pop();
 
@@ -416,6 +417,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                         it.remove();
                                         break;
                                     }
+                                    touchHits++;
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
                                     //it.remove();
@@ -426,7 +428,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setSpinv(1);
                                     //canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
                                     points += item.getValue();
-                                    hits++;
                                 }
                             }
                             for (FlyingItem[] fa: newItems) {
@@ -442,10 +443,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         if (mAxes.size()>3) mAxes.clear();
 
-        if ((points>0 || hits>0) && onPointsListener!=null) {
-            onPointsListener.onPoints(points,hits);
+        if ((points>0) && onPointsListener!=null) {
+            onPointsListener.onPoints(points);
         }
     }
+
+
 
     @Override
     public boolean onTouch(View view, MotionEvent e) {
@@ -486,10 +489,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             case MotionEvent.ACTION_UP:
 
-
+                if ((touchHits>2) && onPointsListener!=null) {
+                    onPointsListener.onCombo(touchHits);
+                }
 
             case MotionEvent.ACTION_DOWN:
                 starttime = System.currentTimeMillis();
+                touchHits=0;
 
         }
 
@@ -587,7 +593,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
     public interface OnPointsListener {
-        void onPoints(int points, int hits);
+        void onPoints(int points);
+        void onCombo(int hits);
         void onMiss(int points);
         void onBoom();
     }

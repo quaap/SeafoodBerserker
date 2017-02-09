@@ -8,40 +8,6 @@
     android:hapticFeedbackEnabled="true">
 
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/scores"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/instpoints"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:textSize="18sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/lives"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:gravity="end"
-            android:layout_gravity="end"
-            android:layout_marginEnd="8dp"
-            android:textSize="18sp" />
-    </LinearLayout>
-
     <com.quaap.fishberserker.MainFishView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

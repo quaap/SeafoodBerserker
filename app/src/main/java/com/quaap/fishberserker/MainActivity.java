@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,9 +14,6 @@ public class MainActivity extends Activity  {
 
     private MainFishView mMainFishView;
 
-    private TextView mPointsView;
-    private TextView mdView;
-    private TextView mLivesView;
 
     private int mPoints;
     private int mLives;
@@ -42,28 +38,29 @@ public class MainActivity extends Activity  {
         if (b!=null) b.hide();
 
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
-        mPointsView = (TextView) findViewById(R.id.scores);
-        mLivesView = (TextView) findViewById(R.id.lives);
+
 
         mLives = 5;
         mWavenum = 0;
 
         mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
             @Override
-            public void onPoints(int points, int hits) {
+            public void onPoints(int points) {
+                mSounds.playGood();
+
+                mPoints += points;
+                updateScores();
+
+            }
+
+            @Override
+            public void onCombo(int hits) {
                 mSounds.playGood();
                 if (hits>2) {
+                    mPoints += hits*10;
                     mMainFishView.setText("Combo Bonus!");
+                    updateScores();
                 }
-                mPoints += points;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        showScores();
-                    }
-                });
-
-
             }
 
             @Override
@@ -82,12 +79,7 @@ public class MainActivity extends Activity  {
                     mLives = 0;
                 }
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        showScores();
-                    }
-                });
+                updateScores();
             }
 
             @Override
@@ -101,9 +93,7 @@ public class MainActivity extends Activity  {
 
     }
 
-    private void showScores() {
-        mPointsView.setText(mPoints + "");
-        mLivesView.setText(mLives + " Lives");
+    private void updateScores() {
         mMainFishView.setTopStatus(mPoints + "", mLives);
     }
 
@@ -152,7 +142,7 @@ public class MainActivity extends Activity  {
         timer = new Timer();
         timer.schedule(task, 2000, 60000);
 
-        showScores();
+        updateScores();
 
     }
 
