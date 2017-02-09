@@ -22,8 +22,13 @@
         android:layout_alignParentStart="true"
         android:id="@+id/pause"
         android:clickable="true"
-        android:textSize="18sp"
-        android:padding="6dp" />
+        android:textSize="30sp"
+        android:padding="6dp"
+        android:textColor="@color/colorAccent"
+        android:shadowColor="@android:color/background_dark"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="8" />
 
 
 </RelativeLayout>

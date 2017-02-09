@@ -83,6 +83,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private int mHeight;
     private OnPointsListener onPointsListener;
     private long mTextStarted;
+
     private long mWaveStarted;
     private int mWaveNum;
     private int mIntervalmillis;
@@ -97,6 +98,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private long starttime;
     private volatile int touchHits;
     private long lastAnchor = System.currentTimeMillis();
+
+    private long mFrameCount;
 
     public MainFishView(Context context) {
         super(context);
@@ -680,7 +683,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         }
                     } else {
                         final long start = System.currentTimeMillis();
+                        mFrameCount++;
 
+                        if (mFrameCount % STEP*5 == 0) {
+
+                        }
                         Canvas c = null;
                         try {
                             c = mSurfaceHolder.lockCanvas();

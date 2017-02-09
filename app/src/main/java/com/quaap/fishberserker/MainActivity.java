@@ -51,10 +51,14 @@ public class MainActivity extends Activity  {
             wasResumed= true;
         }
 
-        findViewById(R.id.fishscreen).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.pause).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (mPaused) {
+                    unpause();
+                } else {
+                    pause();
+                }
             }
         });
 
@@ -114,20 +118,22 @@ public class MainActivity extends Activity  {
 
     }
 
-    private Bundle state;
+    //private Bundle state;
 
     private void pause() {
+        mPaused = true;
         mMainFishView.pause();
-        state = new Bundle();
-        freeze(state);
+        //state = new Bundle();
+        //freeze(state);
 
 
     }
     private void unpause() {
-        if (state!=null) {
-            unfreeze(state);
-        }
+//        if (state!=null) {
+//            unfreeze(state);
+//        }
         mMainFishView.unpause();
+        mPaused = false;
     }
 
     private void updateScores() {
@@ -175,7 +181,7 @@ public class MainActivity extends Activity  {
         timer.cancel();
 
         mBGMusic.releaseBGM();
-        mMainFishView.pause();
+        pause();
 
         int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
@@ -195,10 +201,11 @@ public class MainActivity extends Activity  {
         mSounds = App.getInstance(this).getSoundEffects();
         mBGMusic = mSounds.getBGMusic();
 
-        mMainFishView.unpause();
+        unpause();
         task = new TimerTask() {
             @Override
             public void run() {
+                if (mPaused) return;
                 lastSchedExec = System.currentTimeMillis();
                 mBGMusic.playRandomBGMusic();
                 if (!wasResumed) {

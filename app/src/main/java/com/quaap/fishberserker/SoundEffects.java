@@ -243,21 +243,21 @@ public class SoundEffects {
                     }
 
                     mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
-                    mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
-
-                    mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
-                    mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
+                    //mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
+//
+//                    mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
+//                    mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
 
                     mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
-                    mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
+                   // mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
 
                     mBGMPlayer.setOnCompletionListener(oncomplete);
-                    mBGMPlayerNext.setOnCompletionListener(oncomplete);
+                   // mBGMPlayerNext.setOnCompletionListener(oncomplete);
 
                     mBGMPlayer.setOnErrorListener(onerr);
-                    mBGMPlayerNext.setOnErrorListener(onerr);
+                  //  mBGMPlayerNext.setOnErrorListener(onerr);
 
-
+                    mBGMPlayer.setLooping(true);
                     mBGMPlayer.start();
 
                 }
