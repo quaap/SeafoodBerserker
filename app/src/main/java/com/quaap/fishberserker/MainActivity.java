@@ -14,17 +14,15 @@ public class MainActivity extends Activity  {
 
     final Handler handler = new Handler();
     private final int NEW_LIFE_EVERY = 5000;
-    private final int INTERVAL_MILLIS = 5000;
-    private final int INTERVALS = 11;
 
-    Timer timer;
-    TimerTask task;
+//    Timer timer;
+//    TimerTask task;
     private MainFishView mMainFishView;
     private int mPoints;
     private int mLives;
-    private int mWavenum;
-    private long lastSchedExec;
-    private boolean wasResumed;
+    //private int mWavenum;
+    //private long lastSchedExec;
+    //private boolean wasResumed;
 
     private boolean mPaused;
 
@@ -43,12 +41,12 @@ public class MainActivity extends Activity  {
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
 
         mLives = 5;
-        mWavenum = 0;
-        lastSchedExec = 0;
+//        mWavenum = 0;
+//        lastSchedExec = 0;
 
         if (savedInstanceState!=null) {
             unfreeze(savedInstanceState);
-            wasResumed= true;
+            //wasResumed= true;
         }
 
         findViewById(R.id.pause).setOnClickListener(new View.OnClickListener() {
@@ -69,7 +67,7 @@ public class MainActivity extends Activity  {
                     mLives++;
                     mSounds.playBest();
                 } else {
-                    mSounds.playGood();
+                   // mSounds.playGood();
                 }
 
                 mPoints += points;
@@ -79,7 +77,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onCombo(int hits) {
-                mSounds.playGood();
+                //mSounds.playGood();
                 if (hits>2) {
                     onPoints(hits*10);
                     mMainFishView.setText("Combo Bonus!");
@@ -89,7 +87,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onMiss(int points) {
-                mSounds.playBad();
+               // mSounds.playBad();
                 mLives--;
                 if (mLives<=0) {
                     mMainFishView.setText("Game Over");
@@ -109,7 +107,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onBoom() {
-                mSounds.playBad();
+                //mSounds.playBad();
                 mMainFishView.setText("Boom");
                 onMiss(100);
             }
@@ -151,8 +149,8 @@ public class MainActivity extends Activity  {
 
         bundle.putInt("mPoints", mPoints);
         bundle.putInt("mLives", mLives);
-        bundle.putInt("mWavenum", mWavenum);
-        bundle.putLong("lastSchedExec", lastSchedExec);
+//        bundle.putInt("mWavenum", mWavenum);
+//        bundle.putLong("lastSchedExec", lastSchedExec);
 
         Bundle fishview = new Bundle();
         mMainFishView.freeze(fishview);
@@ -162,13 +160,13 @@ public class MainActivity extends Activity  {
     private void unfreeze(Bundle bundle) {
         mPoints = bundle.getInt("mPoints");
         mLives = bundle.getInt("mLives");
-        mWavenum = bundle.getInt("mWavenum");
-        lastSchedExec = bundle.getLong("lastSchedExec");
+//        mWavenum = bundle.getInt("mWavenum");
+//        lastSchedExec = bundle.getLong("lastSchedExec");
 
 
-        long freeztime = bundle.getLong("freeztime");
-        long diff =  System.currentTimeMillis() - freeztime;
-        lastSchedExec += diff;
+//        long freeztime = bundle.getLong("freeztime");
+//        long diff =  System.currentTimeMillis() - freeztime;
+//        lastSchedExec += diff;
 
         Bundle fishview = bundle.getBundle("fishview");
 
@@ -177,8 +175,8 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onPause() {
-        task.cancel();
-        timer.cancel();
+//        task.cancel();
+//        timer.cancel();
 
         mBGMusic.releaseBGM();
         pause();
@@ -202,36 +200,36 @@ public class MainActivity extends Activity  {
         mBGMusic = mSounds.getBGMusic();
 
         unpause();
-        task = new TimerTask() {
-            @Override
-            public void run() {
-                if (mPaused) return;
-                lastSchedExec = System.currentTimeMillis();
-                mBGMusic.playRandomBGMusic();
-                if (!wasResumed) {
-                    mWavenum++;
-                    mMainFishView.setText("Wave " + mWavenum);
-                    mMainFishView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMainFishView.startWave(mWavenum, INTERVAL_MILLIS, INTERVALS);
-                        }
-                    }, 3500);
-                }
-                wasResumed = false;
-            }
-        };
-
-        timer = new Timer();
-
-        long time = INTERVAL_MILLIS*(INTERVALS+1);
-        long starttime = 2000;
-        if (lastSchedExec>1) {
-            starttime = time-(System.currentTimeMillis()-lastSchedExec);
-            mBGMusic.playRandomBGMusic();
-        }
-
-        timer.schedule(task, starttime, time);
+//        task = new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (mPaused) return;
+//                lastSchedExec = System.currentTimeMillis();
+//                mBGMusic.playRandomBGMusic();
+//                if (!wasResumed) {
+//                    mWavenum++;
+//                    mMainFishView.setText("Wave " + mWavenum);
+//                    mMainFishView.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mMainFishView.startWave(mWavenum, INTERVAL_MILLIS, INTERVALS);
+//                        }
+//                    }, 3500);
+//                }
+//                wasResumed = false;
+//            }
+//        };
+//
+//        timer = new Timer();
+//
+//        long time = INTERVAL_MILLIS*(INTERVALS+1);
+//        long starttime = 2000;
+//        if (lastSchedExec>1) {
+//            starttime = time-(System.currentTimeMillis()-lastSchedExec);
+//            mBGMusic.playRandomBGMusic();
+//        }
+//
+//        timer.schedule(task, starttime, time);
 
         updateScores();
 

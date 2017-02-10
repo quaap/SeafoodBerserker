@@ -39,15 +39,21 @@ import java.util.Stack;
  */
 public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback, SurfaceView.OnTouchListener  {
 
-    public static final int MAX_FLY = 10;
-    public static final double SPAWN_CHANCE = .95;
+
     public static final int CONFIG_HEIGHT = 1000;
     public static final int MIN_SWIPE = 40;
     public static final int SWIPE_OVERSHOOT = 20;
     public static final int MAX_AXES_REPS = 15;
-    public static final int AXE_TIMEOUT = 1000;
+    public static final int AXE_TIMEOUT = 1500;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
+
+    private final long ONE_SECOND = 1000/STEP;
+
+    private final long INTERVAL_FRAMES = 10 * ONE_SECOND;
+    private final long INTERVAL_GAP_FRAMES = ONE_SECOND;
+    private final int INTERVALS = 11;
+
 
     private final double GRAVITY = 1.5;
     private final double AIRRESIST = .06;
@@ -84,11 +90,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private OnPointsListener onPointsListener;
     private long mTextStarted;
 
-    private long mWaveStarted;
-    private int mWaveNum;
-    private int mIntervalmillis;
-    private int mIntervals;
+    private int mIntervalNum = 0;
     private long mIntervalStarted;
+    private int mWaveNum;
+    private long mWaveStarted;
     private int mMaxNumFly;
     private boolean mWaveGoing;
     private double mShipBob = 0;
@@ -97,9 +102,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private float y1;
     private long starttime;
     private volatile int touchHits;
-    private long lastAnchor = System.currentTimeMillis();
+    private long lastAnchor;
 
     private long mFrameCount;
+
 
     public MainFishView(Context context) {
         super(context);
@@ -156,19 +162,17 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     public void freeze(Bundle bundle) {
+        pause();
+
         bundle.putString("mText", mText);
 
-        bundle.putLong("freeztime", System.currentTimeMillis());
-
-       // bundle.putInt("mWaveNum", mWaveNum);
-        bundle.putInt("mIntervalmillis", mIntervalmillis);
-        bundle.putInt("mIntervals", mIntervals);
+        bundle.putLong("mFrameCount", mFrameCount);
+        bundle.putInt("mWaveNum", mWaveNum);
         bundle.putLong("mWaveStarted", mWaveStarted);
         bundle.putLong("mIntervalStarted", mIntervalStarted);
         bundle.putInt("mMaxNumFly", mMaxNumFly);
         bundle.putBoolean("mWaveGoing", mWaveGoing);
-//        bundle.putString("mScore", mScore);
-//        bundle.putInt("mLives", mLives);
+
 
 
         bundle.putInt("numItemsInPlay", itemsInPlay.size());
@@ -180,32 +184,24 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
     }
 
-    private boolean wasResumed;
 
     public void unfreeze(Bundle bundle) {
         mText = bundle.getString("mText");
 
+        mFrameCount = bundle.getLong("mFrameCount");
         mWaveNum = bundle.getInt("mWaveNum");
-        mIntervalmillis = bundle.getInt("mIntervalmillis");
-        mIntervals = bundle.getInt("mIntervals");
         mWaveStarted = bundle.getLong("mWaveStarted");
         mIntervalStarted = bundle.getLong("mIntervalStarted");
         mMaxNumFly = bundle.getInt("mMaxNumFly");
         mWaveGoing = bundle.getBoolean("mWaveGoing");
-//        mScore = bundle.getString("mScore");
-//        mLives = bundle.getInt("mLives");
+
 
         int numitems = bundle.getInt("numItemsInPlay");
         for (int i=0; i<numitems; i++) {
             FlyingItem fi = FlyingItem.create(bundle.getBundle("item"+i));
             itemsInPlay.add(fi);
         }
-
-        long freeztime = bundle.getLong("freeztime");
-        long diff =  System.currentTimeMillis() - freeztime;
-        mWaveStarted += diff;
-        mIntervalStarted += diff;
-        wasResumed = true;
+        pause();
 
     }
 
@@ -216,7 +212,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     public void setText(String text) {
         synchronized (mTextLock) {
             mText = text;
-            mTextStarted = System.currentTimeMillis();
+            mTextStarted = mFrameCount;
         }
     }
 
@@ -229,33 +225,40 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     }
 
-    public void startWave(int num, int intervalmillis, int intervals) {
+    public void startInterval() {
 
-            mWaveNum = num;
-            mIntervalmillis = intervalmillis;
-            mIntervals = intervals;
-            mWaveStarted = System.currentTimeMillis();
-            mIntervalStarted = mWaveStarted;
-            mMaxNumFly = num + 2;
+        if (mIntervalNum%INTERVALS==0) {
+            mWaveNum++;
+            mWaveStarted=mFrameCount;
+            mIntervalNum=0;
+            setText("Wave " + mWaveNum);
             mWaveGoing = true;
+        }
+        mIntervalNum++;
+        Log.d("FishView", "startInterval " + mIntervalNum + " " + (mFrameCount - mIntervalStarted));
+        mIntervalStarted = mFrameCount;
+        mMaxNumFly = mIntervalNum + 2;
+
 
     }
 
     private void spawnAsNeeded() {
         if (mWaveGoing) {
-            long now = System.currentTimeMillis();
-            long wavespan = now - mWaveStarted;
-            if (wavespan < mIntervalmillis * mIntervals) {
+            long now = mFrameCount;
+            if (now - mWaveStarted<INTERVAL_GAP_FRAMES) return;
+
+            long wavespan = mFrameCount - mWaveStarted;
+            if (wavespan < INTERVAL_FRAMES * INTERVALS - INTERVAL_GAP_FRAMES) {
                 long intervalspan = now - mIntervalStarted;
 
-                if (intervalspan > mIntervalmillis) {
-                    mIntervalStarted = now;
+                if (intervalspan > INTERVAL_FRAMES - INTERVAL_GAP_FRAMES) {
+                    //mIntervalStarted = now;
                     return;
                 }
 
-                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) mIntervalmillis) && Utils.getRand(100)>82) {
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>82) {
                     FlyingItem item = spawnFish();
-                    if (Utils.getRand(0,100)>97 || now - lastAnchor>5000 && wavespan>mIntervalmillis/3) {
+                    if (Utils.getRand(0,100)>97 || now - lastAnchor>INTERVAL_FRAMES && wavespan>INTERVAL_FRAMES/3) {
                         item.setBitmap(anchor[0]);
                         item.setBoom(true);
                         item.setYv(Utils.getRand(0,100)<90 ? INITIAL_YVMIN + 2 : INITIAL_YVMAX-2);
@@ -379,7 +382,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 }
 
                 canvas.drawText(mText, mWidth/2 - sum/2, mHeight/3 , mTextPaint);
-                if (System.currentTimeMillis() - mTextStarted > 1500) {
+                if (mFrameCount - mTextStarted > ONE_SECOND*1.5) {
                     mText = null;
                 }
             }
@@ -615,11 +618,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
         Log.d("dimen", mWidth + "x" + mHeight);
-//        if (mThread!=null) {
-//            if (!mThread.isRunning()) {
-//                mThread.start();
-//            }
-//        }
+
     }
 
     @Override
@@ -683,11 +682,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                         }
                     } else {
                         final long start = System.currentTimeMillis();
+
+                        if (mFrameCount % INTERVAL_FRAMES == 0) {
+                            startInterval();
+                        }
                         mFrameCount++;
 
-                        if (mFrameCount % STEP*5 == 0) {
-
-                        }
                         Canvas c = null;
                         try {
                             c = mSurfaceHolder.lockCanvas();
