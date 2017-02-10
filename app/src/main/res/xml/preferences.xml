@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.quaap.fishberserker.SliderPreference
+        android:defaultValue="false"
+        android:title="Sound effects volume"
+        android:key="switch_preference_1" />
+</PreferenceScreen>

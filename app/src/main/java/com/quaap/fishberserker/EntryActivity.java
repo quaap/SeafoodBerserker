@@ -21,6 +21,16 @@ public class EntryActivity extends Activity {
             }
         });
         s = App.getInstance(this).getSoundEffects().getBGMusic();
+
+
+        findViewById(R.id.open_prefs).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent p = new Intent(EntryActivity.this, SettingsActivity.class);
+                startActivity(p);
+            }
+        });
+
     }
 
     @Override
