@@ -2,7 +2,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.quaap.fishberserker.SliderPreference
-        android:defaultValue="false"
+        android:defaultValue="90"
         android:title="Sound effects volume"
-        android:key="switch_preference_1" />
+        android:key="sound_effects_volume" />
+
+    <com.quaap.fishberserker.SliderPreference
+        android:defaultValue="90"
+        android:title="Music volume"
+        android:key="music_volume" />
+
 </PreferenceScreen>

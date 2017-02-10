@@ -15,6 +15,7 @@ package com.quaap.fishberserker;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
@@ -23,10 +24,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,21 +35,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class SoundEffects {
+public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private SoundPool mSounds;
 
-
-
     private Map<Integer,Integer> mSoundIds = new HashMap<>();
-
-
 
     private int [] soundFiles;
 
     private float [] soundVolumes;
     private String [] soundUses;
 
+    private volatile float sfvolume = .9f;
+    private volatile float musicvolume = .2f;
 
     private SharedPreferences appPreferences;
 
@@ -59,6 +56,9 @@ public class SoundEffects {
     private volatile boolean mMute = false;
 
     private Context mContext;
+    private int[] mBGMSongIds;
+    private MediaPlayer mBGMPlayer;
+    private float mBGMVolume;
 
 
     public SoundEffects(final Context context) {
@@ -78,6 +78,7 @@ public class SoundEffects {
         appPreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
 
 
+        appPreferences.registerOnSharedPreferenceChangeListener(this);
 
         soundFiles = getResIdArray(context, R.array.sounds);
 
@@ -106,9 +107,35 @@ public class SoundEffects {
             }
         });
 
-
+        mBGMSongIds = getResIdArray(context, R.array.songs);
     }
 
+    private static int[] getResIdArray(Context context, int id) {
+        final TypedArray idsarr = context.getResources().obtainTypedArray(id);
+        int [] ids = new int[idsarr.length()];
+        for (int i=0; i<idsarr.length(); i++) {
+            ids[i] = idsarr.getResourceId(i, 0);
+        }
+        idsarr.recycle();
+        return ids;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+        //Log.d("Pref", s);
+
+        if (s.equals("sound_effects_volume")) {
+            sfvolume = sharedPreferences.getInt("sound_effects_volume", 90)/100.0f;
+        }
+        if (s.equals("music_volume")) {
+            musicvolume = sharedPreferences.getInt("music_volume", 90)/100.0f;
+
+
+            setBGMusicVolume(musicvolume);
+
+        }
+    }
 
     private boolean isReady() {
         return mReady;
@@ -130,11 +157,14 @@ public class SoundEffects {
     private void play(int soundKey) {
         play(soundKey, 1, 0);
     }
+
     private void play(int soundKey, float speed, int loop) {
+        sfvolume = appPreferences.getInt("sound_effects_volume", 90)/100.0f;
+
         try {
             if (isReady() && !mMute && appPreferences.getBoolean("use_sound_effects", true)) {
 
-                float vol = soundVolumes[soundKey] + getRandHundreth();
+                float vol = soundVolumes[soundKey] * sfvolume + getRandHundreth() ;
                 mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, loop, speed);
                 Log.d("sfx", soundKey + " key");
             }
@@ -155,7 +185,6 @@ public class SoundEffects {
         playUsage("best");
     }
 
-
     public void playUsage(String usage) {
         List<Integer> usages = new ArrayList<>();
         for (int i=0; i<soundUses.length; i++) {
@@ -167,200 +196,115 @@ public class SoundEffects {
         play(usages.get(Utils.getRand(usages.size())));
     }
 
-
-
     private float getRandHundreth() {
         return (float)((Math.random()-.5)/10);
     }
 
-
-
     public void release() {
-        mSounds.release();
-        for (BGMusic b: bgMusics) {
-            try {
-                b.releaseBGM();
-            } catch (Exception e) {
-                Log.e("BGM", e.getMessage(), e);
-            }
-        }
+        appPreferences.unregisterOnSharedPreferenceChangeListener(this);
+
+        releaseBGM();
+
     }
 
 
-    private static int[] getResIdArray(Context context, int id) {
-        final TypedArray idsarr = context.getResources().obtainTypedArray(id);
-        int [] ids = new int[idsarr.length()];
-        for (int i=0; i<idsarr.length(); i++) {
-            ids[i] = idsarr.getResourceId(i, 0);
-        }
-        idsarr.recycle();
-        return ids;
+    private boolean mBGPaused;
+
+    public int getBGMSongs() {
+        return mBGMSongIds.length;
     }
 
-    private List<BGMusic> bgMusics = new ArrayList<>();
 
-    public BGMusic getBGMusic() {
-        BGMusic b = new BGMusic(mContext);
-        bgMusics.add(b);
-        return b;
+    public void playBGMusic() {
+        if (mBGPaused) {
+            mBGMPlayer.start();
+        } else {
+            playRandomBGMusic();
+        }
+
     }
 
-    public static class BGMusic {
+    public void playRandomBGMusic() {
+        playBGMusic(Utils.getRand(mBGMSongIds.length));
 
-        private int[] mBGMSongIds;
-        private MediaPlayer mBGMPlayer;
-        private MediaPlayer mBGMPlayerNext;
+    }
 
-        private float mBGMVolume = .2f;
-
-        private Context mContext;
-
-        private BGMusic(Context context) {
-            mContext = context;
-            mBGMSongIds = getResIdArray(context, R.array.songs);
+    public void pauseBGMusic() {
+        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
+            mBGMPlayer.pause();
+            mBGPaused = true;
         }
+    }
 
-        public int getBGMSongs() {
-            return mBGMSongIds.length;
-        }
+    public void playBGMusic(final int which) {
 
-        public void playRandomBGMusic() {
-            playBGMusic(Utils.getRand(mBGMSongIds.length));
+        mBGPaused = false;
 
-        }
-        public void playBGMusic(final int which) {
+        mBGMVolume = appPreferences.getInt("music_volume", 90)/100.0f;
 
-            Utils.async(new Runnable() {
-                @Override
-                public void run() {
-
-                    if (mBGMPlayer!=null) {
-                        //pauseBGMusic();
-                        mBGMPlayer.release();
-                    }
-                    if (mBGMPlayerNext!=null) {
-                        mBGMPlayerNext.release();
-                    }
-
-                    mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
-                    //mBGMPlayerNext = MediaPlayer.create(mContext, mBGMSongIds[which]);
-//
-//                    mBGMPlayer.setNextMediaPlayer(mBGMPlayerNext);
-//                    mBGMPlayerNext.setNextMediaPlayer(mBGMPlayer);
-
-                    mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
-                   // mBGMPlayerNext.setVolume(mBGMVolume,mBGMVolume);
-
-                    mBGMPlayer.setOnCompletionListener(oncomplete);
-                   // mBGMPlayerNext.setOnCompletionListener(oncomplete);
-
-                    mBGMPlayer.setOnErrorListener(onerr);
-                  //  mBGMPlayerNext.setOnErrorListener(onerr);
-
-                    mBGMPlayer.setLooping(true);
-                    mBGMPlayer.start();
-
-                }
-            });
-        }
-
-
-        Handler h = new Handler();
-
-        private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
+        Utils.async(new Runnable() {
             @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (!((App)mContext.getApplicationContext()).check(mContext)) {
-                    mediaPlayer.release();
+            public void run() {
+
+                if (mBGMPlayer!=null) {
+                    //pauseBGMusic();
                     mBGMPlayer.release();
-                    mBGMPlayerNext.release();
-                    return;
                 }
-                h.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                });
-                mediaPlayer.seekTo(0);
-            }
-        };
-
-        private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                mediaPlayer.release();
-                mBGMPlayer.release();
-                mBGMPlayerNext.release();
-                mBGMPlayer = null;
-                mBGMPlayerNext = null;
-                return false;
-            }
-        };
 
 
-        public void pauseBGMusic() {
-            if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
-                mBGMPlayer.pause();
-            }
-        }
+                mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
 
-        public void restartBGMusic() {
-            pauseBGMusic();
-            if (mBGMPlayer!=null) {
-                mBGMPlayer.seekTo(0);
+
+                mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
+
+
+                mBGMPlayer.setOnCompletionListener(oncomplete);
+
+
+                mBGMPlayer.setOnErrorListener(onerr);
+
+                mBGMPlayer.setLooping(true);
+
                 mBGMPlayer.start();
 
             }
-        }
+        });
+    }
 
-        public void releaseBGM() {
-            if (mBGMPlayer!=null) {
-                try {
-                    mBGMPlayer.setNextMediaPlayer(null);
-                    mBGMPlayer.stop();
-                } catch( Exception e) { };
-                mBGMPlayer.release();
-                mBGMPlayer=null;
-            }
-            if (mBGMPlayerNext!=null) {
-                try {
-                    mBGMPlayerNext.setNextMediaPlayer(null);
-                    mBGMPlayerNext.stop();
-                } catch( Exception e) { };
-                mBGMPlayerNext.release();
-                mBGMPlayerNext=null;
-            }
-        }
 
-        public void deltaBGMusicVolume(float volchange) {
-            float newvol = mBGMVolume+volchange;
-            if (newvol>=0 || newvol <=1) {
-                setBGMusicVolume(newvol);
-            }
-        }
-        public void setBGMusicVolume(float vol) {
-            mBGMVolume = vol;
-            if (mBGMPlayer!=null) {
-                mBGMPlayer.setVolume(mBGMVolume, mBGMVolume);
-            }
-            if (mBGMPlayerNext!=null) {
-                mBGMPlayerNext.setVolume(mBGMVolume, mBGMVolume);
-            }
-        }
 
-        public void setBGMusicVolumeTemp(float vol, long timeoutmillis) {
-            setBGMusicVolume(vol);
-            final Timer t = new Timer();
-            t.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    setBGMusicVolume(mBGMVolume);
-                    t.cancel();
-                }
-            }, timeoutmillis);
+    public void releaseBGM() {
+        if (mBGMPlayer!=null) {
+            try {
+                mBGMPlayer.stop();
+            } catch( Exception e) { };
+            mBGMPlayer.release();
+            mBGMPlayer=null;
+            mBGPaused = false;
         }
     }
 
+
+    public void setBGMusicVolume(float vol) {
+        mBGMVolume = vol;
+        if (mBGMPlayer!=null) {
+            mBGMPlayer.setVolume(mBGMVolume, mBGMVolume);
+        }
+    }
+
+    private MediaPlayer.OnCompletionListener oncomplete = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+           // mediaPlayer.start();
+        }
+    };
+    private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
+        @Override
+        public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+            mBGMPlayer.release();
+            mBGMPlayer = null;
+            return false;
+        }
+    };
 
 }

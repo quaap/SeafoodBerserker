@@ -28,7 +28,6 @@ public class MainActivity extends Activity  {
 
     private SoundEffects mSounds;
 
-    private SoundEffects.BGMusic mBGMusic;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +66,7 @@ public class MainActivity extends Activity  {
                     mLives++;
                     mSounds.playBest();
                 } else {
-                   // mSounds.playGood();
+                    mSounds.playGood();
                 }
 
                 mPoints += points;
@@ -77,7 +76,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onCombo(int hits) {
-                //mSounds.playGood();
+                mSounds.playGood();
                 if (hits>2) {
                     onPoints(hits*10);
                     mMainFishView.setText("Combo Bonus!");
@@ -87,7 +86,7 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onMiss(int points) {
-               // mSounds.playBad();
+                mSounds.playBad();
                 mLives--;
                 if (mLives<=0) {
                     mMainFishView.setText("Game Over");
@@ -178,13 +177,13 @@ public class MainActivity extends Activity  {
 //        task.cancel();
 //        timer.cancel();
 
-        mBGMusic.releaseBGM();
+        mSounds.releaseBGM();
         pause();
 
         int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
-        mBGMusic.releaseBGM();
+        mSounds.releaseBGM();
         super.onPause();
     }
 
@@ -197,7 +196,7 @@ public class MainActivity extends Activity  {
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
         mSounds = App.getInstance(this).getSoundEffects();
-        mBGMusic = mSounds.getBGMusic();
+
 
         unpause();
 //        task = new TimerTask() {
@@ -233,12 +232,14 @@ public class MainActivity extends Activity  {
 
         updateScores();
 
+        mSounds.playBGMusic();
+
     }
 
 
     @Override
     protected void onDestroy() {
-        mBGMusic.releaseBGM();
+        mSounds.releaseBGM();
         super.onDestroy();
     }
 }

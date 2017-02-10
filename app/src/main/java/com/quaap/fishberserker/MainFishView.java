@@ -61,7 +61,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final double INITIAL_XVMIN = AIRRESIST * 30;
     private final double INITIAL_XVMAX = AIRRESIST * 180;
 
-    private final double INITIAL_YVMIN = GRAVITY * -24;
+    private final double INITIAL_YVMIN = GRAVITY * -25;
 
     private final double INITIAL_YVMAX = GRAVITY * -33;
 

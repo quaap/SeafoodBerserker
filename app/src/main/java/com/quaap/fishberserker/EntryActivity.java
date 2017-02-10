@@ -7,7 +7,7 @@ import android.view.View;
 
 public class EntryActivity extends Activity {
 
-    SoundEffects.BGMusic s;
+    SoundEffects s;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,7 +20,7 @@ public class EntryActivity extends Activity {
                 startActivity(game);
             }
         });
-        s = App.getInstance(this).getSoundEffects().getBGMusic();
+        s = App.getInstance(this).getSoundEffects();
 
 
         findViewById(R.id.open_prefs).setOnClickListener(new View.OnClickListener() {
@@ -36,7 +36,7 @@ public class EntryActivity extends Activity {
     @Override
     protected void onPause() {
         //s.pauseBGMusic();
-        s.releaseBGM();
+        //s.releaseBGM();
         super.onPause();
     }
 
@@ -47,9 +47,4 @@ public class EntryActivity extends Activity {
         s.playBGMusic(0);
     }
 
-    @Override
-    protected void onDestroy() {
-        s.releaseBGM();
-        super.onDestroy();
-    }
 }
