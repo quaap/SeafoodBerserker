@@ -6,23 +6,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 
 public class MainActivity extends Activity  {
 
     final Handler handler = new Handler();
     private final int NEW_LIFE_EVERY = 5000;
 
-//    Timer timer;
-//    TimerTask task;
+
     private MainFishView mMainFishView;
     private int mPoints;
     private int mLives;
-    //private int mWavenum;
-    //private long lastSchedExec;
-    //private boolean wasResumed;
+
 
     private boolean mPaused;
 
@@ -40,12 +34,10 @@ public class MainActivity extends Activity  {
         mMainFishView = (MainFishView) findViewById(R.id.fishscreen);
 
         mLives = 5;
-//        mWavenum = 0;
-//        lastSchedExec = 0;
 
         if (savedInstanceState!=null) {
             unfreeze(savedInstanceState);
-            //wasResumed= true;
+
         }
 
         findViewById(R.id.pause).setOnClickListener(new View.OnClickListener() {
@@ -59,9 +51,34 @@ public class MainActivity extends Activity  {
             }
         });
 
-        mMainFishView.setOnPointsListener(new MainFishView.OnPointsListener() {
+        mMainFishView.setOnGameListener(new MainFishView.OnGameListener() {
             @Override
-            public void onPoints(int points) {
+            public void onWaveStart(int wavenum) {
+
+            }
+
+            @Override
+            public void onWaveDone(int wavenum) {
+
+            }
+
+            @Override
+            public void onIntervalStart(int intervalnum) {
+
+            }
+
+            @Override
+            public void onIntervalDone(int intervalnum) {
+
+            }
+
+            @Override
+            public void onItemLaunch() {
+                mSounds.playPuh();
+            }
+
+            @Override
+            public void onItemHit(int points) {
                 if (mPoints%NEW_LIFE_EVERY > (mPoints+points)%NEW_LIFE_EVERY) {
                     mLives++;
                     mSounds.playBest();
@@ -78,7 +95,8 @@ public class MainActivity extends Activity  {
             public void onCombo(int hits) {
                 mSounds.playGood();
                 if (hits>2) {
-                    onPoints(hits*10);
+                    mPoints += hits*10;
+                    updateScores();
                     mMainFishView.setText("Combo Bonus!");
 
                 }
@@ -115,20 +133,13 @@ public class MainActivity extends Activity  {
 
     }
 
-    //private Bundle state;
 
     private void pause() {
         mPaused = true;
         mMainFishView.pause();
-        //state = new Bundle();
-        //freeze(state);
-
-
     }
     private void unpause() {
-//        if (state!=null) {
-//            unfreeze(state);
-//        }
+
         mMainFishView.unpause();
         mPaused = false;
     }
@@ -148,8 +159,6 @@ public class MainActivity extends Activity  {
 
         bundle.putInt("mPoints", mPoints);
         bundle.putInt("mLives", mLives);
-//        bundle.putInt("mWavenum", mWavenum);
-//        bundle.putLong("lastSchedExec", lastSchedExec);
 
         Bundle fishview = new Bundle();
         mMainFishView.freeze(fishview);
@@ -159,13 +168,6 @@ public class MainActivity extends Activity  {
     private void unfreeze(Bundle bundle) {
         mPoints = bundle.getInt("mPoints");
         mLives = bundle.getInt("mLives");
-//        mWavenum = bundle.getInt("mWavenum");
-//        lastSchedExec = bundle.getLong("lastSchedExec");
-
-
-//        long freeztime = bundle.getLong("freeztime");
-//        long diff =  System.currentTimeMillis() - freeztime;
-//        lastSchedExec += diff;
 
         Bundle fishview = bundle.getBundle("fishview");
 
@@ -174,8 +176,6 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onPause() {
-//        task.cancel();
-//        timer.cancel();
 
         mSounds.releaseBGM();
         pause();
@@ -199,36 +199,6 @@ public class MainActivity extends Activity  {
 
 
         unpause();
-//        task = new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (mPaused) return;
-//                lastSchedExec = System.currentTimeMillis();
-//                mBGMusic.playRandomBGMusic();
-//                if (!wasResumed) {
-//                    mWavenum++;
-//                    mMainFishView.setText("Wave " + mWavenum);
-//                    mMainFishView.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mMainFishView.startWave(mWavenum, INTERVAL_MILLIS, INTERVALS);
-//                        }
-//                    }, 3500);
-//                }
-//                wasResumed = false;
-//            }
-//        };
-//
-//        timer = new Timer();
-//
-//        long time = INTERVAL_MILLIS*(INTERVALS+1);
-//        long starttime = 2000;
-//        if (lastSchedExec>1) {
-//            starttime = time-(System.currentTimeMillis()-lastSchedExec);
-//            mBGMusic.playRandomBGMusic();
-//        }
-//
-//        timer.schedule(task, starttime, time);
 
         updateScores();
 

@@ -7,7 +7,7 @@
         android:key="sound_effects_volume" />
 
     <com.quaap.fishberserker.SliderPreference
-        android:defaultValue="90"
+        android:defaultValue="20"
         android:title="Music volume"
         android:key="music_volume" />
 

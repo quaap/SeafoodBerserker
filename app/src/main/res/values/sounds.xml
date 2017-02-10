@@ -13,6 +13,9 @@
 
 
     <array name="sounds">
+        <item>@raw/puh1</item>
+        <item>@raw/puh2</item>
+        <item>@raw/puh3</item>
         <item>@raw/bad1</item>
         <item>@raw/bad2</item>
         <item>@raw/bad3</item>
@@ -25,6 +28,9 @@
     </array>
 
     <string-array name="sounds_usage">
+        <item>puh</item>
+        <item>puh</item>
+        <item>puh</item>
         <item>bad</item>
         <item>bad</item>
         <item>bad</item>
@@ -36,6 +42,9 @@
     </string-array>
 
     <integer-array name="sounds_volumes">
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
         <item>90</item>
         <item>90</item>
         <item>90</item>

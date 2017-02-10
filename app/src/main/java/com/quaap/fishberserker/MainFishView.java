@@ -87,7 +87,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private RunThread mThread;
     private int mWidth;
     private int mHeight;
-    private OnPointsListener onPointsListener;
+    private OnGameListener onGameListener;
     private long mTextStarted;
 
     private int mIntervalNum = 0;
@@ -205,8 +205,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     }
 
-    public void setOnPointsListener(OnPointsListener onPointsListener) {
-        this.onPointsListener = onPointsListener;
+    public void setOnGameListener(OnGameListener onGameListener) {
+        this.onGameListener = onGameListener;
     }
 
     public void setText(String text) {
@@ -227,8 +227,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     public void startInterval() {
 
+
         if (mIntervalNum%INTERVALS==0) {
             mWaveNum++;
+
+            if (onGameListener!=null) {
+                onGameListener.onWaveStart(mWaveNum);
+            }
             mWaveStarted=mFrameCount;
             mIntervalNum=0;
             setText("Wave " + mWaveNum);
@@ -239,6 +244,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         mIntervalStarted = mFrameCount;
         mMaxNumFly = mIntervalNum + 2;
 
+
+        if (onGameListener!=null) {
+            onGameListener.onIntervalStart(mIntervalNum);
+        }
 
     }
 
@@ -253,6 +262,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
                 if (intervalspan > INTERVAL_FRAMES - INTERVAL_GAP_FRAMES) {
                     //mIntervalStarted = now;
+
+                    if (onGameListener!=null) {
+                        onGameListener.onIntervalDone(mIntervalNum);
+                    }
+
                     return;
                 }
 
@@ -266,6 +280,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     }
                 }
             } else {
+                if (onGameListener!=null) {
+                    onGameListener.onWaveDone(mWaveNum);
+                }
                 mWaveGoing = false;
             }
         }
@@ -304,6 +321,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         synchronized (itemsInPlay) {
             itemsInPlay.add(item);
+        }
+        if (onGameListener !=null) {
+            onGameListener.onItemLaunch();
         }
         return item;
     }
@@ -442,8 +462,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                 FlyingItem item = it.next();
                 item.updatePosition(GRAVITY * CONFIG_HEIGHT / mHeight, AIRRESIST);
                 if (item.getY() > mHeight && item.getYv() > 0 || item.getX() < 0 || item.getX() > mWidth) {
-                    if (!item.isBoom() && !item.wasHit() && onPointsListener != null) {
-                        onPointsListener.onMiss(item.getValue());
+                    if (!item.isBoom() && !item.wasHit() && onGameListener != null) {
+                        onGameListener.onMiss(item.getValue());
                     }
                     it.remove();
                 } else if (item.getYv() <= 0 || item.wasHit() || item.isBoom()) {
@@ -471,7 +491,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                 FlyingItem item = it.next();
                                 if (item.isHit(axe[i], axe[i + 1])) {
                                     if (item.isBoom()) {
-                                        if (onPointsListener!=null) onPointsListener.onBoom();
+                                        if (onGameListener !=null) onGameListener.onBoom();
                                         it.remove();
                                         break;
                                     }
@@ -486,6 +506,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                     item.setSpinv(1);
                                     //canvas.drawBitmap(splats[s],(float)item.getX()-splats[0].getWidth()/2, (float)item.getY()-splats[0].getHeight()/2, null);
                                     points += item.getValue();
+                                    if (onGameListener !=null) {
+                                        onGameListener.onItemHit(points);
+                                    }
                                 }
                             }
                             for (FlyingItem[] fa: newItems) {
@@ -501,9 +524,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         if (mAxes.size()>3) mAxes.clear();
 
-        if ((points>0) && onPointsListener!=null) {
-            onPointsListener.onPoints(points);
-        }
+//        if ((points>0) && onGameListener !=null) {
+//            onGameListener.onPoints(points);
+//        }
     }
 
 
@@ -547,8 +570,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             case MotionEvent.ACTION_UP:
 
-                if ((touchHits>2) && onPointsListener!=null) {
-                    onPointsListener.onCombo(touchHits);
+                if ((touchHits>2) && onGameListener !=null) {
+                    onGameListener.onCombo(touchHits);
                 }
 
             case MotionEvent.ACTION_DOWN:
@@ -646,8 +669,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
 
-    public interface OnPointsListener {
-        void onPoints(int points);
+    public interface OnGameListener {
+        void onWaveStart(int wavenum);
+        void onWaveDone(int wavenum);
+        void onIntervalStart(int intervalnum);
+        void onIntervalDone(int intervalnum);
+        void onItemLaunch();
+        void onItemHit(int points);
         void onCombo(int hits);
         void onMiss(int points);
         void onBoom();

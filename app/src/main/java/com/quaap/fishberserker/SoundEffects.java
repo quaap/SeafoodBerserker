@@ -173,6 +173,9 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
         }
     }
 
+    public void playPuh() {
+        playUsage("puh");
+    }
     public void playGood() {
         playUsage("good");
     }
