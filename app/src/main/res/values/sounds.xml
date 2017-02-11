@@ -50,6 +50,9 @@
     </string-array>
 
     <integer-array name="sounds_volumes">
+        <item>95</item>
+        <item>95</item>
+        <item>95</item>
         <item>90</item>
         <item>90</item>
         <item>90</item>
@@ -58,13 +61,10 @@
         <item>90</item>
         <item>90</item>
         <item>90</item>
-        <item>90</item>
-        <item>90</item>
-        <item>90</item>
-        <item>90</item>
-        <item>90</item>
-        <item>90</item>
-        <item>90</item>
+        <item>70</item>
+        <item>70</item>
+        <item>70</item>
+        <item>70</item>
     </integer-array>
 
 </resources>

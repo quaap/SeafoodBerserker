@@ -199,11 +199,13 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
             }
         }
 
-        play(usages.get(Utils.getRand(usages.size())));
+        if (usages.size()>0) {
+            play(usages.get(Utils.getRand(usages.size())));
+        }
     }
 
     private float getRandHundreth() {
-        return (float)((Math.random()-.5)/10);
+        return (float)((Math.random()-.5)/100);
     }
 
     public void release() {
