@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * Created by tom on 2/3/17.
@@ -127,6 +128,7 @@ public class FlyingItem {
 
     }
 
+    int count=0;
     public void updatePosition(double gravity, double airresit) {
         mYv -= Math.signum(mYv)*airresit;
         mXv -= Math.signum(mXv)*airresit;
@@ -143,6 +145,8 @@ public class FlyingItem {
         if (!wasHit()) {
             mScale += (1 - mScale) / 33;
         }
+        count++;
+
     }
 
     public boolean isHit(float x, float y) {

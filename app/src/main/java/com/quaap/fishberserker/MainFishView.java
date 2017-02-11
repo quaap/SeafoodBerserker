@@ -58,8 +58,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final double GRAVITY = 1.5;
     private final double AIRRESIST = .06;
 
-    private final double INITIAL_XVMIN = AIRRESIST * 30;
-    private final double INITIAL_XVMAX = AIRRESIST * 180;
+//    private final double INITIAL_XVMIN = AIRRESIST * 30;
+//    private final double INITIAL_XVMAX = AIRRESIST * 160;
 
     private final double INITIAL_YVMIN = GRAVITY * -25;
 
@@ -305,15 +305,19 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         FlyingItem item = FlyingItem.getCopy(availableItems.get(randomIndex));
         //FlyingItem item = FlyingItem.getCopy(availableItems.get(Utils.getRand(availableItems.size())));
 
-        double xv = Utils.getRand(INITIAL_XVMIN, INITIAL_XVMAX) * Math.signum(Math.random()-.5);
+        int xmid = (int)(mWidth/2*.9);
+
+        double xvmin = xmid/100;
+        double xvmax = xmid/70;
+
+        double xv = Utils.getRand(xvmin, xvmax) * Math.signum(Math.random()*2-1);
         item.setXv(xv);
 
-        int xmid = (int)(mWidth/2*.8);
 
         if (xv<0) {
             item.setX(mWidth - Utils.getRand(xmid) - xmid/4);
         } else {
-            item.setX(Utils.getRand(xmid) + 20);
+            item.setX(Utils.getRand(xmid) + xmid/8);
         }
         item.setY(mHeight + 20);
         item.setYv(Utils.getRand(INITIAL_YVMIN, INITIAL_YVMAX));
@@ -465,6 +469,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     if (!item.isBoom() && !item.wasHit() && onGameListener != null) {
                         onGameListener.onMiss(item.getValue());
                     }
+                    //Log.d("fly", "lived " + item.count);
                     it.remove();
                 } else if (item.getYv() <= 0 || item.wasHit() || item.isBoom()) {
 
