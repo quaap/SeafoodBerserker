@@ -24,6 +24,10 @@
         <item>@raw/up1</item>
         <item>@raw/dundunquick</item>
         <item>@raw/prog1</item>
+        <item>@raw/chop1</item>
+        <item>@raw/chop2</item>
+        <item>@raw/chop3</item>
+        <item>@raw/chop4</item>
 
     </array>
 
@@ -39,9 +43,17 @@
         <item>good</item>
         <item>better</item>
         <item>best</item>
+        <item>chop</item>
+        <item>chop</item>
+        <item>chop</item>
+        <item>chop</item>
     </string-array>
 
     <integer-array name="sounds_volumes">
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
+        <item>90</item>
         <item>90</item>
         <item>90</item>
         <item>90</item>

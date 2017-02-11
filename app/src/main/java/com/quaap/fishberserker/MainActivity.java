@@ -79,11 +79,10 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onItemHit(int points) {
+                mSounds.playChop();
                 if (mPoints%NEW_LIFE_EVERY > (mPoints+points)%NEW_LIFE_EVERY) {
                     mLives++;
                     mSounds.playBest();
-                } else {
-                    mSounds.playGood();
                 }
 
                 mPoints += points;

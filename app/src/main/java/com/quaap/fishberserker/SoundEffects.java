@@ -165,7 +165,7 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
             if (isReady() && !mMute && appPreferences.getBoolean("use_sound_effects", true)) {
 
                 float vol = soundVolumes[soundKey] * sfvolume + getRandHundreth() ;
-                mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, loop, speed);
+                mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, loop, speed + getRandHundreth());
                 Log.d("sfx", soundKey + " key");
             }
         } catch (Exception e) {
@@ -173,6 +173,9 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
         }
     }
 
+    public void playChop() {
+        playUsage("chop");
+    }
     public void playPuh() {
         playUsage("puh");
     }
