@@ -95,8 +95,11 @@ public class Utils {
         return asyncRepeat(r,delaymillis,1);
     }
 
-
     public static synchronized TimerTask asyncRepeat(final Runnable r, final int repeatmillis, final int times) {
+        return asyncRepeat(r, repeatmillis, times, null);
+    }
+
+    public static synchronized TimerTask asyncRepeat(final Runnable r, final int repeatmillis, final int times, final Runnable last) {
         final int[] counter = new int[1];
         counter[0]=0;
         final Timer t = new Timer();
@@ -106,6 +109,9 @@ public class Utils {
                 try {
                     if (counter[0]++ >= times) {
                         t.cancel();
+
+                        if (last!=null) last.run();
+
                         return;
                     }
                     r.run();

@@ -54,12 +54,12 @@ public class MainActivity extends Activity  {
         mMainFishView.setOnGameListener(new MainFishView.OnGameListener() {
             @Override
             public void onWaveStart(int wavenum) {
-
+                mSounds.playBGMusic();
             }
 
             @Override
             public void onWaveDone(int wavenum) {
-
+                mSounds.fadeBGMusic();
             }
 
             @Override
@@ -191,7 +191,7 @@ public class MainActivity extends Activity  {
         super.onResume();
 
         // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY  ;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
         mSounds = App.getInstance(this).getSoundEffects();

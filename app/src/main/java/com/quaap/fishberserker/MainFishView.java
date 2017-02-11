@@ -40,7 +40,7 @@ import java.util.Stack;
 public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback, SurfaceView.OnTouchListener  {
 
 
-    public static final int CONFIG_HEIGHT = 1000;
+    public static final int CONFIG_HEIGHT = 900;
     public static final int MIN_SWIPE = 40;
     public static final int SWIPE_OVERSHOOT = 20;
     public static final int MAX_AXES_REPS = 15;
@@ -51,8 +51,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final long ONE_SECOND = 1000/STEP;
 
     private final long INTERVAL_FRAMES = 10 * ONE_SECOND;
-    private final long INTERVAL_GAP_FRAMES = ONE_SECOND;
-    private final int INTERVALS = 11;
+    private final long INTERVAL_GAP_FRAMES = 2 *ONE_SECOND;
+    private final int INTERVALS = 5;
 
 
     private final double GRAVITY = 1.5;
@@ -270,12 +270,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     return;
                 }
 
-                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>82) {
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>85) {
                     FlyingItem item = spawnFish();
                     if (Utils.getRand(0,100)>97 || now - lastAnchor>INTERVAL_FRAMES && wavespan>INTERVAL_FRAMES/3) {
                         item.setBitmap(anchor[0]);
                         item.setBoom(true);
-                        item.setYv(Utils.getRand(0,100)<90 ? INITIAL_YVMIN + 2 : INITIAL_YVMAX-2);
+                        item.setYv(Utils.getRand(0,100)<90 ? INITIAL_YVMIN : INITIAL_YVMAX-2);
                         lastAnchor = now;
                     }
                 }

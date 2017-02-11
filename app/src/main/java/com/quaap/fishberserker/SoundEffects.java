@@ -244,11 +244,36 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
         }
     }
 
+    TimerTask fader;
+
+    public void fadeBGMusic() {
+        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
+
+            fader = Utils.asyncRepeat(new Runnable() {
+                @Override
+                public void run() {
+                    mBGMVolume -= .01;
+                    setBGMusicVolume(mBGMVolume);
+                }
+            }, 40, 15, new Runnable() {
+                @Override
+                public void run() {
+                    mBGPaused = false;
+                    mBGMPlayer.pause();
+                }
+            });
+
+
+            mBGPaused = true;
+        }
+    }
+
     public void playBGMusic(final int which) {
+
+        if (fader!=null) fader.cancel();
 
         mBGPaused = false;
 
-        mBGMVolume = appPreferences.getInt("music_volume", 90)/100.0f;
 
         Utils.async(new Runnable() {
             @Override
@@ -262,6 +287,7 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
 
                 mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
 
+                mBGMVolume = appPreferences.getInt("music_volume", 90)/100.0f;
 
                 mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
 
