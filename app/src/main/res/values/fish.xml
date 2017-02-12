@@ -28,9 +28,9 @@
         <item>40</item>
         <item>40</item>
         <item>45</item>
-        <item>50</item>
-        <item>60</item>
+        <item>80</item>
         <item>90</item>
+        <item>95</item>
     </integer-array>
 
 </resources>
