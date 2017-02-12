@@ -3,8 +3,14 @@
 
     <array name="fish">
         <item>@drawable/fish1</item>
+        <item>@drawable/halibut</item>
         <item>@drawable/fish2</item>
+        <item>@drawable/halibut2</item>
         <item>@drawable/fish3</item>
+        <item>@drawable/halibut3</item>
+        <item>@drawable/wolffish1</item>
+        <item>@drawable/lancet</item>
+        <item>@drawable/lancet2</item>
         <item>@drawable/fish4</item>
         <item>@drawable/lobster2</item>
         <item>@drawable/octo</item>
@@ -12,10 +18,16 @@
     </array>
 
     <integer-array name="points">
+        <item>5</item>
         <item>10</item>
+        <item>15</item>
         <item>20</item>
+        <item>25</item>
         <item>30</item>
+        <item>35</item>
         <item>40</item>
+        <item>40</item>
+        <item>45</item>
         <item>50</item>
         <item>60</item>
         <item>90</item>
