@@ -88,6 +88,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private int mLives;
     private volatile String mText;
     private RunThread mThread;
+    private volatile boolean mPaused = false;
+
     private int mWidth;
     private int mHeight;
     private OnGameListener onGameListener;
@@ -541,6 +543,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     @Override
     public boolean onTouch(View view, MotionEvent e) {
+
+        if (mPaused) return true;
+
         float x0 = e.getX();
         float y0 = e.getY();
         //Log.d("f", e.getAction() + " " + x + " ," + y);
@@ -659,17 +664,17 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     public void pause() {
-        if (mThread!=null) mThread.pauseRunning();
+        if (mThread!=null) mPaused = true;
 
     }
 
     public void unpause() {
-        if (mThread != null) mThread.unpauseRunning();
+        if (mThread != null) mPaused = false;
     }
 
     public void end() {
         if (mThread!=null) {
-            mThread.pauseRunning();
+            mPaused = true;
             mThread.stopRunning();
         }
 
@@ -689,13 +694,13 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         void onBoom();
     }
 
+
     class RunThread extends Thread {
 
 
         private final SurfaceHolder mSurfaceHolder;
 
 
-        private volatile boolean mPaused = false;
         private volatile boolean mRun = false;
 
 
@@ -749,13 +754,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
         }
 
 
-        public void pauseRunning() {
-            mPaused = true;
-        }
-
-        public void unpauseRunning() {
-            mPaused = false;
-        }
 
         public void stopRunning() {
             Log.d("RunThread", "stopRunning");
