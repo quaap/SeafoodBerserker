@@ -1,4 +1,4 @@
-package com.quaap.fishberserker;
+package com.quaap.fishberserker.game;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,6 +16,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+
+import com.quaap.fishberserker.R;
+import com.quaap.fishberserker.component.Utils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

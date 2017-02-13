@@ -1,4 +1,4 @@
-package com.quaap.fishberserker;
+package com.quaap.fishberserker.game;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -6,7 +6,8 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.quaap.fishberserker.component.Utils;
 
 /**
  * Created by tom on 2/3/17.
@@ -54,7 +55,7 @@ public class FlyingItem {
 
         mPaint = new Paint();
         //mPaint.setColorFilter(new PorterDuffColorFilter(Color.argb(255, Utils.getRandInt(10,180), Utils.getRandInt(10,180), Utils.getRandInt(10,180)), PorterDuff.Mode.SRC_IN));
-        mScale = (float)Utils.getRand(.1,.4);
+        mScale = (float) Utils.getRand(.1,.4);
     }
 
 

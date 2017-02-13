@@ -3,6 +3,8 @@ package com.quaap.fishberserker;
 import android.app.Application;
 import android.content.Context;
 
+import com.quaap.fishberserker.component.SoundEffects;
+
 /**
  * Created by tom on 2/5/17.
  * <p>

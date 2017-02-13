@@ -1,4 +1,4 @@
-package com.quaap.fishberserker;
+package com.quaap.fishberserker.component;
 
 /**
  * Created by tom on 2/5/17.
@@ -27,11 +27,12 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.quaap.fishberserker.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
 
 

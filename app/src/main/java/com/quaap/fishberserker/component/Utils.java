@@ -1,4 +1,4 @@
-package com.quaap.fishberserker;
+package com.quaap.fishberserker.component;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;

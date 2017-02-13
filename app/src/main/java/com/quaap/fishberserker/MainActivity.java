@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 
+import com.quaap.fishberserker.component.SoundEffects;
+import com.quaap.fishberserker.game.MainFishView;
+
 
 public class MainActivity extends Activity  {
 

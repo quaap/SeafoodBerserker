@@ -1,4 +1,4 @@
-package com.quaap.fishberserker;
+package com.quaap.fishberserker.component;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.quaap.fishberserker.R;
 
 
 /**

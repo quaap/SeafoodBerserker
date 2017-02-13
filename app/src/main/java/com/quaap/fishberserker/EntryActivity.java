@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.quaap.fishberserker.component.SoundEffects;
+
 public class EntryActivity extends Activity {
 
     SoundEffects s;
