@@ -2,6 +2,7 @@ package com.quaap.fishberserker;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -146,6 +147,14 @@ public class MainActivity extends Activity  {
                     mMainFishView.setText("Game Over");
                     mMainFishView.end();
 
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent entry = new Intent(MainActivity.this,EntryActivity.class);
+                            MainActivity.this.finish();
+                            startActivity(entry);
+                        }
+                    }, 2000);
                 }
             }, 500);
             mLives = 0;
