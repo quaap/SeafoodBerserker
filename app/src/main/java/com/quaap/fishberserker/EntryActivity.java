@@ -47,7 +47,7 @@ public class EntryActivity extends Activity {
 
     @Override
     protected void onPause() {
-        //s.pauseBGMusic();
+        s.pauseBGMusic();
         //s.releaseBGM();
         super.onPause();
     }

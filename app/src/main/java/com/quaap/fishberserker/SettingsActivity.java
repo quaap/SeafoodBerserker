@@ -31,6 +31,19 @@ public class SettingsActivity  extends PreferenceActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        App.getInstance(this).getSoundEffects().playBGMusic(0);
+    }
+
+    @Override
+    protected void onPause() {
+        App.getInstance(this).getSoundEffects().playBGMusic(0);
+        super.onPause();
     }
 
     @Override
