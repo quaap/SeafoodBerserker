@@ -109,7 +109,7 @@ public class MainActivity extends Activity  {
                 if (hits>2) {
                     mPoints += hits*10;
                     updateScores();
-                    mMainFishView.setText("Combo Bonus!");
+                    mMainFishView.setText(getString(R.string.bonus));
 
                 }
             }
@@ -127,7 +127,7 @@ public class MainActivity extends Activity  {
             @Override
             public void onBoom() {
                 //mSounds.playBad();
-                mMainFishView.setText("Boom");
+                mMainFishView.setText(getString(R.string.boom));
                 loseLife();
                 onMiss(100);
 
@@ -140,11 +140,11 @@ public class MainActivity extends Activity  {
     private void loseLife() {
         mLives--;
         if (mLives <= 0) {
-            mMainFishView.setText("Game Over");
+            mMainFishView.setText(getString(R.string.gameover));
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mMainFishView.setText("Game Over");
+                    mMainFishView.setText(getString(R.string.gameover));
                     mMainFishView.end();
 
                     handler.postDelayed(new Runnable() {

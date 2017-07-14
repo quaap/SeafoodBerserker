@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">FishBerserker</string>
+    <string name="bonus">Combo Bonus!</string>
+    <string name="boom">Boom</string>
+    <string name="gameover">Game Over</string>
+    <string name="arcade">Arcade</string>
+    <string name="don_t_miss">Don\'t Miss!</string>
+    <string name="prefs">Prefs</string>
 
 </resources>

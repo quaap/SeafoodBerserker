@@ -19,7 +19,7 @@
 
         android:layout_margin="20dp"
         android:padding="16dp"
-        android:text="Arcade"
+        android:text="@string/arcade"
         android:textSize="30sp" />
 
     <Button
@@ -29,7 +29,7 @@
         android:layout_margin="20dp"
         android:padding="16dp"
 
-        android:text="Don't Miss!"
+        android:text="@string/don_t_miss"
         android:textSize="30sp" />
 
     <Button
@@ -37,5 +37,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="Prefs" />
+        android:text="@string/prefs" />
 </LinearLayout>
