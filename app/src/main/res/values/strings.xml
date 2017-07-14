@@ -6,5 +6,6 @@
     <string name="arcade">Arcade</string>
     <string name="don_t_miss">Don\'t Miss!</string>
     <string name="prefs">Prefs</string>
+    <string name="volume">Volume</string>
 
 </resources>

@@ -312,7 +312,7 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
         if (mBGMPlayer!=null) {
             try {
                 mBGMPlayer.stop();
-            } catch( Exception e) { };
+            } catch( Exception e) { }
             mBGMPlayer.release();
             mBGMPlayer=null;
             mBGPaused = false;
