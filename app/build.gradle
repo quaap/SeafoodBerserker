@@ -6,9 +6,7 @@ android {
     defaultConfig {
         applicationId "com.quaap.fishberserker"
         minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 25
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
