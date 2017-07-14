@@ -3,6 +3,7 @@ package com.quaap.fishberserker;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -16,6 +17,8 @@ public class MainActivity extends Activity  {
     public static final String GAME_TYPE = "GAMETYPE";
     public static final int GAME_TYPE_CLASSIC = 0;
     public static final int GAME_TYPE_ARCADE = 1;
+
+    public static final String GAME_HORZ = "GAMEHORZ";
 
 
     final Handler handler = new Handler();
@@ -32,6 +35,7 @@ public class MainActivity extends Activity  {
     private SoundEffects mSounds;
 
     private int gameType = GAME_TYPE_CLASSIC;
+    private boolean gameHorz = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,8 @@ public class MainActivity extends Activity  {
         });
 
         gameType = getIntent().getIntExtra(GAME_TYPE, GAME_TYPE_CLASSIC);
+        gameHorz = getIntent().getBooleanExtra(GAME_HORZ, false);
+       // setOrientation();
 
         mMainFishView.setOnGameListener(new MainFishView.OnGameListener() {
             @Override
@@ -116,8 +122,8 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onMiss(int points) {
-                mSounds.playBad();
                 if (gameType==GAME_TYPE_CLASSIC) {
+                    mSounds.playBad();
                     loseLife();
                 }
 
@@ -231,12 +237,22 @@ public class MainActivity extends Activity  {
 
         mSounds.playBGMusic();
 
-    }
 
+    }
 
     @Override
     protected void onDestroy() {
         mSounds.releaseBGM();
         super.onDestroy();
     }
+
+    private void setOrientation() {
+        if (gameHorz) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
+    }
+
 }

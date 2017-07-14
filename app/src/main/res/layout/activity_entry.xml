@@ -12,12 +12,24 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.quaap.fishberserker.EntryActivity">
 
+    <Switch
+        android:id="@+id/orienty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:checked="false"
+        android:showText="true"
+        android:switchMinWidth="50dp"
+        android:textOff="Easier"
+        android:textOn="Harder"
+        android:textSize="24sp" />
+
     <Button
         android:id="@+id/start_arcade_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_margin="15dp"
+        android:layout_margin="10dp"
         android:padding="16dp"
         android:text="@string/arcade"
         android:textSize="26sp" />
@@ -26,7 +38,7 @@
         android:id="@+id/start_classic_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="10dp"
         android:padding="16dp"
 
         android:text="@string/don_t_miss"
@@ -36,6 +48,6 @@
         android:id="@+id/open_prefs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
+        android:layout_margin="10dp"
         android:text="@string/prefs" />
 </LinearLayout>
