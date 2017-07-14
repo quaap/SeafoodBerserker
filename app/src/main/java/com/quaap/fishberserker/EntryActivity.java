@@ -49,13 +49,13 @@ public class EntryActivity extends Activity {
             }
         });
 
-        findViewById(R.id.orienty).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                horz = ((Switch)view).isChecked();
-                setOrientation();
-            }
-        });
+//        findViewById(R.id.orienty).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                horz = ((Switch)view).isChecked();
+//                setOrientation();
+//            }
+//        });
 
 
 
@@ -73,7 +73,7 @@ public class EntryActivity extends Activity {
 
     @Override
     protected void onPause() {
-        //s.pauseBGMusic();
+        s.pauseBGMusic();
         //s.releaseBGM();
         super.onPause();
     }

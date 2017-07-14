@@ -22,7 +22,8 @@
         android:switchMinWidth="50dp"
         android:textOff="Easier"
         android:textOn="Harder"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/start_arcade_game"
