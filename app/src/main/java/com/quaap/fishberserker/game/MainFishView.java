@@ -604,8 +604,6 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        mThread = new RunThread(surfaceHolder);
-        mThread.start();
     }
 
     @Override
@@ -656,12 +654,17 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
         Log.d("dimen", mWidth + "x" + mHeight);
+        mThread = new RunThread(surfaceHolder);
+        mThread.start();
+
 
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        mThread.stopRunning();
+        if (mThread!=null && mThread.isRunning()) {
+            mThread.stopRunning();
+        }
         mThread = null;
     }
 
