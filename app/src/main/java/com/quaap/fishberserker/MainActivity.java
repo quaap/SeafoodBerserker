@@ -126,11 +126,10 @@ public class MainActivity extends Activity  {
 
             @Override
             public void onBoom() {
-                //mSounds.playBad();
+                mSounds.playBad();
                 mMainFishView.setText(getString(R.string.boom));
                 loseLife();
-                onMiss(100);
-
+                updateScores();
             }
         });
 
@@ -154,7 +153,7 @@ public class MainActivity extends Activity  {
                             MainActivity.this.finish();
                             startActivity(entry);
                         }
-                    }, 2000);
+                    }, 2500);
                 }
             }, 500);
             mLives = 0;
