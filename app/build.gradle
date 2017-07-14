@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.1"
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.quaap.fishberserker"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"

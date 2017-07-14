@@ -12,6 +12,11 @@ import com.quaap.fishberserker.game.MainFishView;
 
 public class MainActivity extends Activity  {
 
+    public static final String GAME_TYPE = "GAMETYPE";
+    public static final int GAME_TYPE_CLASSIC = 0;
+    public static final int GAME_TYPE_ARCADE = 1;
+
+
     final Handler handler = new Handler();
     private final int NEW_LIFE_EVERY = 5000;
 
@@ -24,6 +29,8 @@ public class MainActivity extends Activity  {
     private boolean mPaused;
 
     private SoundEffects mSounds;
+
+    private int gameType = GAME_TYPE_CLASSIC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,8 @@ public class MainActivity extends Activity  {
                 }
             }
         });
+
+        gameType = getIntent().getIntExtra(GAME_TYPE, GAME_TYPE_CLASSIC);
 
         mMainFishView.setOnGameListener(new MainFishView.OnGameListener() {
             @Override
@@ -107,18 +116,8 @@ public class MainActivity extends Activity  {
             @Override
             public void onMiss(int points) {
                 mSounds.playBad();
-                mLives--;
-                if (mLives<=0) {
-                    mMainFishView.setText("Game Over");
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMainFishView.setText("Game Over");
-                            mMainFishView.end();
-
-                        }
-                    },500);
-                    mLives = 0;
+                if (gameType==GAME_TYPE_CLASSIC) {
+                    loseLife();
                 }
 
                 updateScores();
@@ -128,11 +127,29 @@ public class MainActivity extends Activity  {
             public void onBoom() {
                 //mSounds.playBad();
                 mMainFishView.setText("Boom");
+                loseLife();
                 onMiss(100);
+
             }
         });
 
 
+    }
+
+    private void loseLife() {
+        mLives--;
+        if (mLives <= 0) {
+            mMainFishView.setText("Game Over");
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mMainFishView.setText("Game Over");
+                    mMainFishView.end();
+
+                }
+            }, 500);
+            mLives = 0;
+        }
     }
 
 

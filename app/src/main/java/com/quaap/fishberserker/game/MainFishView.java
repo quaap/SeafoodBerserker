@@ -43,11 +43,12 @@ import java.util.Stack;
 public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback, SurfaceView.OnTouchListener  {
 
 
-    public static final int CONFIG_HEIGHT = 900;
-    public static final int MIN_SWIPE = 40;
-    public static final int SWIPE_OVERSHOOT = 20;
-    public static final int MAX_AXES_REPS = 15;
-    public static final int AXE_TIMEOUT = 1500;
+
+    private static final int CONFIG_HEIGHT = 900;
+    private static final int MIN_SWIPE = 40;
+    private static final int SWIPE_OVERSHOOT = 20;
+    private static final int MAX_AXES_REPS = 15;
+    private static final int AXE_TIMEOUT = 3000;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
@@ -110,6 +111,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private long lastAnchor;
 
     private long mFrameCount;
+
 
 
     public MainFishView(Context context) {
@@ -275,7 +277,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     return;
                 }
 
-                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>85) {
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>82) {
                     FlyingItem item = spawnFish();
                     if (Utils.getRand(0,100)>97 || now - lastAnchor>INTERVAL_FRAMES && wavespan>INTERVAL_FRAMES/3) {
                         item.setBitmap(anchor[0]);

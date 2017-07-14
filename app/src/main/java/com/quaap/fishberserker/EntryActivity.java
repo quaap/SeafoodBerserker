@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.quaap.fishberserker.component.SoundEffects;
+import com.quaap.fishberserker.game.MainFishView;
 
 public class EntryActivity extends Activity {
 
@@ -15,10 +16,20 @@ public class EntryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
 
-        findViewById(R.id.start_game).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.start_classic_game).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent game = new Intent(EntryActivity.this, MainActivity.class);
+                game.putExtra(MainActivity.GAME_TYPE, MainActivity.GAME_TYPE_CLASSIC);
+                startActivity(game);
+            }
+        });
+
+        findViewById(R.id.start_arcade_game).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent game = new Intent(EntryActivity.this, MainActivity.class);
+                game.putExtra(MainActivity.GAME_TYPE, MainActivity.GAME_TYPE_ARCADE);
                 startActivity(game);
             }
         });
