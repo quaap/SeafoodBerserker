@@ -53,7 +53,7 @@
             android:layout_toEndOf="@+id/start_arcade_game"
             android:layout_toStartOf="@+id/start_classic_game"
             android:gravity="center"
-            android:text="&lt;-- Choose! --&gt;"
+            android:text="@string/choose"
             android:textStyle="bold" />
 
         <Button
@@ -88,6 +88,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="About" />
+            android:text="@string/about_b" />
     </LinearLayout>
 </LinearLayout>
