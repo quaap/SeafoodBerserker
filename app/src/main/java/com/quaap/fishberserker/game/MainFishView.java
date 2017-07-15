@@ -48,7 +48,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private static final int MIN_SWIPE = 40;
     private static final int SWIPE_OVERSHOOT = 20;
     private static final int MAX_AXES_REPS = 15;
-    private static final int AXE_TIMEOUT = 3000;
+    private static final int AXE_TIMEOUT = 5000;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
