@@ -53,7 +53,8 @@
             android:layout_toEndOf="@+id/start_arcade_game"
             android:layout_toStartOf="@+id/start_classic_game"
             android:gravity="center"
-            android:text="&lt;-- Choose! --&gt;" />
+            android:text="&lt;-- Choose! --&gt;"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/start_classic_game"
@@ -69,10 +70,24 @@
     </RelativeLayout>
 
 
-    <Button
-        android:id="@+id/open_prefs"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/prefs" />
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/open_prefs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/prefs" />
+
+        <Button
+            android:id="@+id/about_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="About" />
+    </LinearLayout>
 </LinearLayout>

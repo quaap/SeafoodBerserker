@@ -3,10 +3,17 @@
     <string name="bonus">Combo Bonus!</string>
     <string name="boom">Boom</string>
     <string name="gameover">Game Over</string>
-    <string     name="arcade">Arcade style</string>
+    <string name="arcade">Arcade style</string>
     <string name="don_t_miss">Don\'t Miss!</string>
     <string name="prefs">Prefs</string>
     <string name="volume">Volume</string>
     <string name="blurb">Forget ninjas. Forget Fruit. The Vikings need your help to defeat the seafood! This is best Heavy-Metal-Viking-themed fish-slaughter game you\'ve ever played.</string>
+    <string name="close">Close</string>
+
+
+
+    <string name="about">This program is open-source software. The sourcecode and license can be found at https://github.com/quaap/SeafoodBerserker</string>
+
+    <string name="name_link">Copyright 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
 
 </resources>

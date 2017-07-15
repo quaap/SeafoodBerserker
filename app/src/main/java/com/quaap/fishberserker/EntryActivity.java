@@ -48,6 +48,15 @@ public class EntryActivity extends Activity {
             }
         });
 
+
+        findViewById(R.id.about_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent about = new Intent(EntryActivity.this, AboutActivity.class);
+                startActivity(about);
+            }
+        });
+
 //        findViewById(R.id.orienty).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
