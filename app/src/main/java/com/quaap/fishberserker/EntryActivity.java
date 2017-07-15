@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Switch;
 
 import com.quaap.fishberserker.component.SoundEffects;
 
@@ -22,9 +21,9 @@ public class EntryActivity extends Activity {
         findViewById(R.id.start_classic_game).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent game = new Intent(EntryActivity.this, MainActivity.class);
-                game.putExtra(MainActivity.GAME_TYPE, MainActivity.GAME_TYPE_CLASSIC);
-                game.putExtra(MainActivity.GAME_HORZ, horz);
+                Intent game = new Intent(EntryActivity.this, PlayActivity.class);
+                game.putExtra(PlayActivity.GAME_TYPE, PlayActivity.GAME_TYPE_CLASSIC);
+                game.putExtra(PlayActivity.GAME_HORZ, horz);
                 startActivity(game);
             }
         });
@@ -32,9 +31,9 @@ public class EntryActivity extends Activity {
         findViewById(R.id.start_arcade_game).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent game = new Intent(EntryActivity.this, MainActivity.class);
-                game.putExtra(MainActivity.GAME_TYPE, MainActivity.GAME_TYPE_ARCADE);
-                game.putExtra(MainActivity.GAME_HORZ, horz);
+                Intent game = new Intent(EntryActivity.this, PlayActivity.class);
+                game.putExtra(PlayActivity.GAME_TYPE, PlayActivity.GAME_TYPE_ARCADE);
+                game.putExtra(PlayActivity.GAME_HORZ, horz);
                 startActivity(game);
             }
         });

@@ -12,7 +12,7 @@ import com.quaap.fishberserker.component.SoundEffects;
 import com.quaap.fishberserker.game.MainFishView;
 
 
-public class MainActivity extends Activity  {
+public class PlayActivity extends Activity  {
 
     public static final String GAME_TYPE = "GAMETYPE";
     public static final int GAME_TYPE_CLASSIC = 0;
@@ -155,8 +155,8 @@ public class MainActivity extends Activity  {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent entry = new Intent(MainActivity.this,EntryActivity.class);
-                            MainActivity.this.finish();
+                            Intent entry = new Intent(PlayActivity.this,EntryActivity.class);
+                            PlayActivity.this.finish();
                             startActivity(entry);
                         }
                     }, 2500);
