@@ -31,7 +31,7 @@
 
     </array>
 
-    <string-array name="sounds_usage">
+    <string-array name="sounds_usage" translatable="false">
         <item>puh</item>
         <item>puh</item>
         <item>puh</item>
