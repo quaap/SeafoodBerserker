@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Berserk de la Mer !</string>
+    <string name="bonus">Bonus Combo !</string>
+    <string name="boom">Boum</string>
+    <string name="gameover">Perdu</string>
+    <string name="arcade">Mode Arcade</string>
+    <string name="don_t_miss">Attrape tout</string>
+    <string name="prefs">Préférences</string>
+    <string name="volume">Volume</string>
+    <string name="blurb">Oubliez les ninjas, oubliez les fruits. Les Vikings ont besoin de vous pour vaincre les poissons et crustacés ! Voici le meilleur jeu heavy métal viking de massacre de poissons auquel vous ayez jamais joué.</string>
+    <string name="close">Fermer</string>
+
+
+
+    <string name="about">Ce programme est un logiciel libre. Le code source ainsi que la licence sont disponibles à l\'adresse https://github.com/quaap/SeafoodBerserker</string>
+
+    <string name="name_link">Copyright 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
+    <string name="choose">← Choisissez ! →</string>
+    <string name="about_b">À propos</string>
+
+</resources>
