@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Seafood Berserker!</string>
+    <string name="bonus">Combo Bonus!</string>
+    <string name="boom">Boom</string>
+    <string name="gameover">Game Over</string>
+    <string name="arcade">Arcade Modus</string>
+    <string name="don_t_miss">Verpasse nicht!</string>
+    <string name="prefs">Einstellungen</string>
+    <string name="volume">Lautstärke</string>
+    <string name="blurb">Vergiss Ninjas. Vergiss Früchte. Die Vikinger erwarten deine Hilfe um die Tiere des Meeres zu besiegen. Das ist das beste Heavy-Metal Vikinger-Fisch-Massaker Spiel das du jemals gespielt hast!</string>
+    <string name="close">Schließen</string>
+
+
+
+    <string name="about">Diese Anwendung ist Open Source Software. Der Quellcode und die Lizenz  kann hier abgerufen werden: https://github.com/quaap/SeafoodBerserker</string>
+
+    <string name="choose">← Wähle! →</string>
+    <string name="about_b">Über</string>
+
+</resources>
