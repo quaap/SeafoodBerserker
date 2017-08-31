@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Ο Μπερζέκερ των Ψαρικών!</string>
+    <string name="bonus">Συνδυαστικά Τυχερά!</string>
+    <string name="boom">Μπαμ</string>
+    <string name="gameover">Τέλος Παιχνιδιού</string>
+    <string name="arcade">Ηλεκτρονική Μορφή</string>
+    <string name="don_t_miss">Μην Αστοχήσεις!</string>
+    <string name="prefs">Προτιμήσεις</string>
+    <string name="volume">Ένταση</string>
+    <string name="blurb">Παράτα του νίντζες. Ξέχνα τα φρούτα. Οι Βίκινγκς χρειάζονται τη βοήθειά σου. Να νικήσουν τα ψαρικά! Εδώ είσαι στο καλύτερο Χεβυμεταλλικό, Βικινγκσικό, Ψαρομακελλάρικο, παιχνίδι, που θα παίξεις ποτέ στη ζωή σου!!!</string>
+    <string name="close">Κλείσιμο</string>
+
+
+
+    <string name="about">Αυτό το πρόγραμμα είναι λογισμικό ανοιχτής-πηγής. Ο πηγαίος κώδικας, και η άδεια, μπορούν να βρεθούν στο https://github.com/quaap/SeafoodBerserker</string>
+
+    <string name="name_link">Πνευματικά Δικαιώματα 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
+    <string name="choose"><![CDATA[← Επέλεξε! →]]></string>
+    <string name="about_b">Σχετικά με</string>
+
+</resources>
+
