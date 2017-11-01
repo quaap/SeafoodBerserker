@@ -48,7 +48,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private static final int MIN_SWIPE = 40;
     private static final int SWIPE_OVERSHOOT = 20;
     private static final int MAX_AXES_REPS = 15;
-    private static final int AXE_TIMEOUT = 5000;
+    private static final int AXE_TIMEOUT = 50000;
 
     private final long STEP = 33; // 1000 ms / ~30 fps  =  33
 
@@ -107,9 +107,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private float x1;
     private float y1;
     private long starttime;
-    private volatile int touchHits;
     private long lastAnchor;
 
+    private List<Long> hittimes = new ArrayList<>();
+    //private volatile int touchHits;
     private long mFrameCount;
 
 
@@ -507,7 +508,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                         it.remove();
                                         break;
                                     }
-                                    touchHits++;
+                                    hittimes.add(System.currentTimeMillis());
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
                                     //it.remove();
@@ -534,6 +535,8 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             }
         }
 
+        checkCombo(true);
+
         if (mAxes.size()>3) mAxes.clear();
 
 //        if ((points>0) && onGameListener !=null) {
@@ -541,6 +544,34 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 //        }
     }
 
+    private void checkCombo(boolean usemin) {
+
+        int hits = 0;
+
+        long now = System.currentTimeMillis();
+        for(Iterator<Long> timeit = hittimes.listIterator(); timeit.hasNext(); ) {
+            long diff = now - timeit.next();
+            if ((!usemin || diff > 500) && diff < 1000) {
+                hits++;
+            } else if (diff > 1000){
+                timeit.remove();
+            }
+            Log.d("GGG", "" + diff);
+        }
+
+        if (hits>2 && onGameListener !=null) {
+            onGameListener.onCombo(hits);
+            hittimes.clear();
+        }
+
+//        long diff = mFrameCount - firstHitTime;
+//        if ((!usemin || diff > ONE_SECOND/2) && diff <= ONE_SECOND && touchHits>2) {
+//            if (onGameListener !=null) onGameListener.onCombo(touchHits);
+//            touchHits = 0;
+//        } else if (touchHits>0 && diff > ONE_SECOND) {
+//            touchHits = 0;
+//        }
+    }
 
 
     @Override
@@ -584,14 +615,14 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
             case MotionEvent.ACTION_UP:
-
-                if ((touchHits>2) && onGameListener !=null) {
-                    onGameListener.onCombo(touchHits);
-                }
+                checkCombo(false);
+//                if ((touchHits>2) && onGameListener !=null) {
+//                    onGameListener.onCombo(touchHits);
+//                }
 
             case MotionEvent.ACTION_DOWN:
                 starttime = System.currentTimeMillis();
-                touchHits=0;
+                hittimes.clear();
 
         }
 

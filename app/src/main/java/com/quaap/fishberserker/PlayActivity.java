@@ -23,6 +23,7 @@ public class PlayActivity extends Activity  {
 
     final Handler handler = new Handler();
     private final int NEW_LIFE_EVERY = 5000;
+    private final int MAX_LIVES = 10;
 
 
     private MainFishView mMainFishView;
@@ -100,8 +101,10 @@ public class PlayActivity extends Activity  {
             public void onItemHit(int points) {
                 mSounds.playChop();
                 if (mPoints%NEW_LIFE_EVERY > (mPoints+points)%NEW_LIFE_EVERY) {
-                    mLives++;
-                    mSounds.playBest();
+                    if (mLives<MAX_LIVES) {
+                        mLives++;
+                        mSounds.playBest();
+                    }
                 }
 
                 mPoints += points;
