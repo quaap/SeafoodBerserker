@@ -553,10 +553,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             long diff = now - timeit.next();
             if ((!usemin || diff > 500) && diff < 1000) {
                 hits++;
-            } else if (diff > 1000){
+            } else if (diff >= 1000){
                 timeit.remove();
             }
-            Log.d("GGG", "" + diff);
+            //Log.d("GGG", "" + diff);
         }
 
         if (hits>2 && onGameListener !=null) {

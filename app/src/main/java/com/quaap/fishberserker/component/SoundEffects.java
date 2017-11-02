@@ -167,7 +167,7 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
 
                 float vol = soundVolumes[soundKey] * sfvolume + getRandHundreth() ;
                 mSounds.play(mSoundIds.get(soundKey), vol, vol, 1, loop, speed + getRandHundreth());
-                Log.d("sfx", soundKey + " key");
+                //Log.d("sfx", soundKey + " key");
             }
         } catch (Exception e) {
             Log.e("SoundEffects", "Error playing " + soundKey, e);
