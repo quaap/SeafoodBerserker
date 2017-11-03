@@ -14,7 +14,6 @@
 
     <string name="about">Αυτό το πρόγραμμα είναι λογισμικό ανοιχτής-πηγής. Ο πηγαίος κώδικας, και η άδεια, μπορούν να βρεθούν στο https://github.com/quaap/SeafoodBerserker</string>
 
-    <string name="name_link">Πνευματικά Δικαιώματα 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
     <string name="choose"><![CDATA[← Επέλεξε! →]]></string>
     <string name="about_b">Σχετικά με</string>
 
