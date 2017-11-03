@@ -109,7 +109,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private long starttime;
     private long lastAnchor;
 
-    private List<Long> hittimes = new ArrayList<>();
+    final private List<Long> hittimes = new ArrayList<>();
     //private volatile int touchHits;
     private long mFrameCount;
 
@@ -508,7 +508,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                                         it.remove();
                                         break;
                                     }
-                                    hittimes.add(System.currentTimeMillis());
+                                    synchronized (hittimes) {
+                                        hittimes.add(System.currentTimeMillis());
+                                    }
                                     item.setHit();
                                     newItems.add(item.cut(axe[i], axe[i + 1]));
                                     //it.remove();
@@ -548,20 +550,22 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         int hits = 0;
 
-        long now = System.currentTimeMillis();
-        for(Iterator<Long> timeit = hittimes.listIterator(); timeit.hasNext(); ) {
-            long diff = now - timeit.next();
-            if ((!usemin || diff > 500) && diff < 1000) {
-                hits++;
-            } else if (diff >= 1000){
-                timeit.remove();
+        synchronized (hittimes) {
+            long now = System.currentTimeMillis();
+            for (Iterator<Long> timeit = hittimes.listIterator(); timeit.hasNext(); ) {
+                long diff = now - timeit.next();
+                if ((!usemin || diff > 500) && diff < 1000) {
+                    hits++;
+                } else if (diff >= 1000) {
+                    timeit.remove();
+                }
+                //Log.d("GGG", "" + diff);
             }
-            //Log.d("GGG", "" + diff);
-        }
 
-        if (hits>2 && onGameListener !=null) {
-            onGameListener.onCombo(hits);
-            hittimes.clear();
+            if (hits > 2 && onGameListener != null) {
+                onGameListener.onCombo(hits);
+                hittimes.clear();
+            }
         }
 
 //        long diff = mFrameCount - firstHitTime;
@@ -622,7 +626,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
             case MotionEvent.ACTION_DOWN:
                 starttime = System.currentTimeMillis();
-                hittimes.clear();
+                synchronized (hittimes) {
+                    hittimes.clear();
+                }
 
         }
 
