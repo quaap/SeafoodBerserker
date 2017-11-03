@@ -14,7 +14,7 @@
 
     <string name="about">This program is open-source software. The sourcecode and license can be found at https://github.com/quaap/SeafoodBerserker</string>
 
-    <string name="name_link">Copyright 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
+    <string name="name_link" translatable="false">Copyright 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
     <string name="choose"><![CDATA[← Choose! →]]></string>
     <string name="about_b">About</string>
 
