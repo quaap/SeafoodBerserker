@@ -188,8 +188,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             FlyingItem fi = itemsInPlay.get(i);
             Bundle b = new Bundle();
             fi.freeze(b);
-            bundle.putBundle("item" + i, b);
+            bundle.putBundle("i" + i, b);
         }
+        Log.d("Fish", bundle.toString());
     }
 
 
@@ -206,8 +207,10 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         int numitems = bundle.getInt("numItemsInPlay");
         for (int i=0; i<numitems; i++) {
-            FlyingItem fi = FlyingItem.create(bundle.getBundle("item"+i));
-            itemsInPlay.add(fi);
+            FlyingItem fi = FlyingItem.create(bundle.getBundle("i"+i));
+            if (fi!=null) {
+                itemsInPlay.add(fi);
+            }
         }
         pause();
 

@@ -83,6 +83,9 @@ public class FlyingItem {
     public static FlyingItem create(Bundle bundle) {
 
         Bitmap bitmap = bundle.getParcelable("mBitmap");
+        if (bitmap==null) {
+            return null;
+        }
         FlyingItem item2 = new FlyingItem(bitmap);
 
         item2.mX = bundle.getDouble("mX");
@@ -96,8 +99,8 @@ public class FlyingItem {
         item2.fade = bundle.getBoolean("fade");
 
         item2.mPaint = new Paint();
-        item2.mPaint.setColor(bundle.getInt("mPaintColor"));
-        item2.mPaint.setAlpha(bundle.getInt("mPaintAlpha"));
+        item2.mPaint.setColor(bundle.getInt("mPC"));
+        item2.mPaint.setAlpha(bundle.getInt("mPA"));
         item2.mScale = bundle.getDouble("mScale");
         item2.mHit = bundle.getBoolean("mHit");
         item2.mValue = bundle.getInt("mValue");
@@ -107,8 +110,9 @@ public class FlyingItem {
 
     public void freeze(Bundle bundle) {
 
-        bundle.putParcelable("mBitmap", mBitmap);
-        
+        if (mBitmap.getHeight()*mBitmap.getWidth()<20000) {
+            bundle.putParcelable("mBitmap", mBitmap);
+        }
         bundle.putDouble("mX", mX);
         bundle.putDouble("mXv", mXv);
         bundle.putDouble("mY", mY);
@@ -121,8 +125,8 @@ public class FlyingItem {
         bundle.putBoolean("fade", fade);
 
 
-        bundle.putInt("mPaintColor", mPaint.getColor());
-        bundle.putInt("mPaintAlpha", mPaint.getAlpha());
+        bundle.putInt("mPC", mPaint.getColor());
+        bundle.putInt("mPA", mPaint.getAlpha());
         bundle.putDouble("mScale", mScale);
         bundle.putBoolean("mHit", mHit);
         bundle.putDouble("mValue", mValue);
