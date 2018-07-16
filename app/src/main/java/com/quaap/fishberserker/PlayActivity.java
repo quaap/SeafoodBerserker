@@ -51,10 +51,6 @@ public class PlayActivity extends Activity  {
 
         mLives = 5;
 
-        if (savedInstanceState!=null) {
-            unfreeze(savedInstanceState);
-
-        }
 
         findViewById(R.id.pause).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,8 +138,14 @@ public class PlayActivity extends Activity  {
             }
         });
 
+        if (savedInstanceState!=null) {
+            unfreeze(savedInstanceState);
+            unpause();
+        }
 
     }
+
+
 
     private void loseLife() {
         mLives--;
@@ -208,6 +210,15 @@ public class PlayActivity extends Activity  {
         Bundle fishview = bundle.getBundle("fishview");
 
         mMainFishView.unfreeze(fishview);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                pause();
+                unpause();
+            }
+        }, 3000);
+
     }
 
     @Override
@@ -239,8 +250,6 @@ public class PlayActivity extends Activity  {
         updateScores();
 
         mSounds.playBGMusic();
-
-
     }
 
     @Override

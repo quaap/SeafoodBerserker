@@ -7,7 +7,6 @@ android {
         applicationId "com.quaap.fishberserker"
         minSdkVersion 19
         targetSdkVersion 28
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
