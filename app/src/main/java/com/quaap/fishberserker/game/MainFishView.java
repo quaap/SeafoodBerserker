@@ -396,11 +396,12 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     }
 
     private void drawBackground(Canvas canvas, double shipBobSin) {
-        Rect dst = new Rect(0, (int) (shipBobSin * 10), mWidth, mHeight);
+        //Rect dst = new Rect(0, (int) (shipBobSin * 10), mWidth, mHeight);
 
-        canvas.drawBitmap(bgsScaled[0], null, dst, null);
+        //canvas.drawBitmap(bgsScaled[0], null, dst, null);
+        canvas.drawBitmap(bgsScaled[0], 0,(int)(shipBobSin * 10), null);
 
-        // canvas.drawPaint(mBGPaint);
+         //canvas.drawPaint(mBGPaint);
     }
 
     private void drawPopupText(Canvas canvas) {
@@ -657,7 +658,7 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
             int bgw2 = (int) (bgw / (double) bgh * mHeight);
 
             Rect src = new Rect(bgw>mWidth ? Utils.getRand(bgw - mWidth-1):0, 0, bgw, bgh);
-            Rect dest = new Rect(0, 0, bgw2, mHeight);
+            Rect dest = new Rect(0, 0, b==0?mWidth:bgw2, mHeight);
 
             bgsScaled[b] = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bgsScaled[b]);
@@ -693,6 +694,9 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
 
         Log.d("dimen", mWidth + "x" + mHeight);
+        if (mThread!=null) {
+            mThread.stopRunning();
+        }
         mThread = new RunThread(surfaceHolder);
         mThread.start();
 
