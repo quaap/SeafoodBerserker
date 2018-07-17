@@ -16,6 +16,7 @@
 
     <string name="choose"><![CDATA[← Επέλεξε! →]]></string>
     <string name="about_b">Σχετικά με</string>
+    <string name="high_score_lab">Υψηλή Βαθμολογία: %1$d\n On %2$tb %2$te, %2$tY</string>
 
 </resources>
 

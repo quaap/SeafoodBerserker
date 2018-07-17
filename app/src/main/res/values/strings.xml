@@ -17,5 +17,6 @@
     <string name="name_link" translatable="false">Copyright 2017 Tom Kliethermes. . http://quaap.com/D/programming-index?from=SeafoodBerserker</string>
     <string name="choose"><![CDATA[← Choose! →]]></string>
     <string name="about_b">About</string>
+    <string name="high_score_lab">High score: %1$d\n On %2$tb %2$te, %2$tY</string>
 
 </resources>

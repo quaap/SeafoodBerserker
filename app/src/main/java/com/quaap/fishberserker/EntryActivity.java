@@ -2,9 +2,11 @@ package com.quaap.fishberserker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.quaap.fishberserker.component.SoundEffects;
 
@@ -91,6 +93,15 @@ public class EntryActivity extends Activity {
         super.onResume();
         s.playBGMusic(0);
 
+        TextView scorelabel = findViewById(R.id.high_score);
+        SharedPreferences prefs = getSharedPreferences("scores", MODE_PRIVATE);
+        int score = prefs.getInt("score",0);
+        if (score>0) {
+            long scoredate = prefs.getLong("date",0);
+            scorelabel.setText(getString(R.string.high_score_lab, score, scoredate));
+        } else {
+            scorelabel.setText("");
+        }
     }
 
 }

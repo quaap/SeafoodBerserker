@@ -3,6 +3,7 @@ package com.quaap.fishberserker;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,8 @@ import android.view.View;
 
 import com.quaap.fishberserker.component.SoundEffects;
 import com.quaap.fishberserker.game.MainFishView;
+
+import java.util.Date;
 
 
 public class PlayActivity extends Activity  {
@@ -38,11 +41,15 @@ public class PlayActivity extends Activity  {
     private int gameType = GAME_TYPE_CLASSIC;
     private boolean gameHorz = false;
 
+    private SharedPreferences mPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        mPrefs = getSharedPreferences("scores", MODE_PRIVATE);
 
         ActionBar b = getActionBar();
         if (b!=null) b.hide();
@@ -184,6 +191,10 @@ public class PlayActivity extends Activity  {
 
     private void updateScores() {
         mMainFishView.setTopStatus(mPoints + "", mLives);
+        if (mPoints>0 && mPoints>mPrefs.getInt("score",0) ) {
+            mPrefs.edit().putInt("score", mPoints).putLong("date",new Date().getTime()).apply();
+        }
+
     }
 
     @Override
