@@ -225,12 +225,15 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
 
 
     public void playBGMusic() {
-        if (mBGPaused) {
-            mBGMPlayer.start();
-        } else {
-            playRandomBGMusic();
+        try {
+            if (mBGPaused && mBGMPlayer!=null) {
+                mBGMPlayer.start();
+            } else {
+                playRandomBGMusic();
+            }
+        } catch (Exception e) {
+            Log.d("SFX", e.getMessage(), e);
         }
-
     }
 
     public void playRandomBGMusic() {
@@ -239,33 +242,41 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
     }
 
     public void pauseBGMusic() {
-        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
-            mBGMPlayer.pause();
-            mBGPaused = true;
+        try {
+            if (mBGMPlayer != null && mBGMPlayer.isPlaying()) {
+                mBGMPlayer.pause();
+                mBGPaused = true;
+            }
+        } catch (Exception e) {
+            Log.d("SFX", e.getMessage(), e);
         }
     }
 
     TimerTask fader;
 
     public void fadeBGMusic() {
-        if (mBGMPlayer!=null && mBGMPlayer.isPlaying()) {
+        try {
+            if (mBGMPlayer != null && mBGMPlayer.isPlaying()) {
 
-            fader = Utils.asyncRepeat(new Runnable() {
-                @Override
-                public void run() {
-                    mBGMVolume -= .01;
-                    setBGMusicVolume(mBGMVolume);
-                }
-            }, 40, 15, new Runnable() {
-                @Override
-                public void run() {
-                    mBGPaused = false;
-                    mBGMPlayer.pause();
-                }
-            });
+                fader = Utils.asyncRepeat(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBGMVolume -= .01;
+                        setBGMusicVolume(mBGMVolume);
+                    }
+                }, 40, 15, new Runnable() {
+                    @Override
+                    public void run() {
+                        mBGPaused = false;
+                        mBGMPlayer.pause();
+                    }
+                });
 
 
-            mBGPaused = true;
+                mBGPaused = true;
+            }
+        } catch (Exception e) {
+            Log.d("SFX", e.getMessage(), e);
         }
     }
 
@@ -280,27 +291,32 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
             @Override
             public void run() {
 
-                if (mBGMPlayer!=null) {
-                    //pauseBGMusic();
-                    mBGMPlayer.release();
+                try {
+
+                    if (mBGMPlayer != null) {
+                        //pauseBGMusic();
+                        mBGMPlayer.release();
+                    }
+
+
+                    mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
+
+                    mBGMVolume = appPreferences.getInt("music_volume", 90) / 100.0f;
+
+                    mBGMPlayer.setVolume(mBGMVolume, mBGMVolume);
+
+
+                    mBGMPlayer.setOnCompletionListener(oncomplete);
+
+
+                    mBGMPlayer.setOnErrorListener(onerr);
+
+                    mBGMPlayer.setLooping(true);
+
+                    mBGMPlayer.start();
+                } catch (Exception e) {
+                    Log.d("SFX", e.getMessage(), e);
                 }
-
-
-                mBGMPlayer = MediaPlayer.create(mContext, mBGMSongIds[which]);
-
-                mBGMVolume = appPreferences.getInt("music_volume", 90)/100.0f;
-
-                mBGMPlayer.setVolume(mBGMVolume,mBGMVolume);
-
-
-                mBGMPlayer.setOnCompletionListener(oncomplete);
-
-
-                mBGMPlayer.setOnErrorListener(onerr);
-
-                mBGMPlayer.setLooping(true);
-
-                mBGMPlayer.start();
 
             }
         });
@@ -336,7 +352,7 @@ public class SoundEffects implements SharedPreferences.OnSharedPreferenceChangeL
     private MediaPlayer.OnErrorListener onerr = new MediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-            mBGMPlayer.release();
+            mediaPlayer.release();
             mBGMPlayer = null;
             return false;
         }
