@@ -59,15 +59,15 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
     private final int INTERVALS = 5;
 
 
-    private final double GRAVITY = 1.5;
+    private final double GRAVITY = 2; //1.53;
     private final double AIRRESIST = .06;
 
 //    private final double INITIAL_XVMIN = AIRRESIST * 30;
 //    private final double INITIAL_XVMAX = AIRRESIST * 160;
 
-    private final double INITIAL_YVMIN = GRAVITY * -25;
+    private final double INITIAL_YVMIN = GRAVITY * -19;
 
-    private final double INITIAL_YVMAX = GRAVITY * -33;
+    private final double INITIAL_YVMAX = GRAVITY * -28;
 
     private final List<FlyingItem> availableItems = new ArrayList<>();
     private final List<FlyingItem> itemsInPlay = new ArrayList<>();
@@ -283,12 +283,16 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
                     return;
                 }
 
-                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) && Utils.getRand(100)>82) {
+                if (itemsInPlay.size() < mMaxNumFly * (intervalspan / (double) INTERVAL_FRAMES) + .2 && Utils.getRand(100)>80) {
                     FlyingItem item = spawnFish();
-                    if (Utils.getRand(0,100)>97 || now - lastAnchor>INTERVAL_FRAMES && wavespan>INTERVAL_FRAMES/3) {
+                    if (Utils.getRand(0,100)>91 || now - lastAnchor>INTERVAL_FRAMES/2 && wavespan>INTERVAL_FRAMES/5) {
                         item.setBitmap(anchor[0]);
                         item.setBoom(true);
-                        item.setYv(Utils.getRand(0,100)<90 ? INITIAL_YVMIN : INITIAL_YVMAX-2);
+                        if (Utils.getRand(0,100)<70) {
+                            item.setYv(Utils.getRand(0, 100) < 75 ? INITIAL_YVMIN : INITIAL_YVMAX - 2);
+                        } else {
+                            item.setYv(Utils.getRand(INITIAL_YVMAX, INITIAL_YVMIN ));
+                        }
                         lastAnchor = now;
                     }
                 }
