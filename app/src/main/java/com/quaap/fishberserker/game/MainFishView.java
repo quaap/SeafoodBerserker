@@ -355,10 +355,11 @@ public class MainFishView extends SurfaceView implements  SurfaceHolder.Callback
 
         spawnAsNeeded();
 
-        mShipBob +=.06;
+        mShipBob +=.05;
         double shipBobSin = Math.sin(mShipBob);
+        double bgBobSin = Math.sin(mShipBob*1.5);
 
-        drawBackground(canvas, shipBobSin);
+        drawBackground(canvas, bgBobSin);
 
 
         markHits(canvas);
