@@ -6,7 +6,7 @@ This is best Heavy-Metal Viking-themed fish-slaughter game you\'ve ever played.
 
 This game is not really finished, and probably has a lot of bugs, but I hope you enjoy it anyway!
 
-See a demo of it [on youtube](https://youtu.be/_1qAJ96vnpQ)
+See a demo of it [on YouTube](https://youtu.be/_1qAJ96vnpQ).
 
 ## Downloads
 
